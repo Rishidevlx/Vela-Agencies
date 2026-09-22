@@ -6,19 +6,6 @@ import {
   FiUser, FiPhone, FiMapPin, FiPackage, FiCalendar, FiFileText, FiTag 
 } from 'react-icons/fi';
 
-const POPULAR_TRANSPORTS = [
-  'VRL Logistics',
-  'ABT Parcel Service',
-  'ARC Transport',
-  'Supreme Logistics',
-  'Rathimeena Parcel',
-  'Royal Express',
-  'KPN Speed Parcel',
-  'ST Courier / Cargo',
-  'Mettur Transports',
-  'TAT Transport'
-];
-
 const TransportEntry = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -125,11 +112,6 @@ const TransportEntry = () => {
     }
   };
 
-  // Select Popular Transport Chip
-  const handleSelectTransport = (name) => {
-    setFormData(prev => ({ ...prev, transport_name: name }));
-  };
-
   // Reset Form
   const handleReset = () => {
     setFormData({
@@ -152,20 +134,20 @@ const TransportEntry = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.transport_name.trim()) {
-      toast.error('Please enter or select Transport Name');
-      return;
-    }
-    if (!formData.transport_city.trim()) {
-      toast.error('Please enter Transport City / Destination');
-      return;
-    }
     if (!formData.customer_name.trim()) {
       toast.error('Please enter Customer Name');
       return;
     }
     if (!formData.customer_phone.trim()) {
       toast.error('Please enter Customer Phone Number');
+      return;
+    }
+    if (!formData.transport_name.trim()) {
+      toast.error('Please enter Transport Name');
+      return;
+    }
+    if (!formData.transport_city.trim()) {
+      toast.error('Please enter Transport City / Destination');
       return;
     }
 
@@ -230,8 +212,8 @@ const TransportEntry = () => {
         </Link>
       </div>
 
-      {/* Main Form Container */}
-      <form onSubmit={handleSubmit} className="max-w-4xl bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-8">
+      {/* Main Form Container - Full Width */}
+      <form onSubmit={handleSubmit} className="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-8">
         
         {/* Section 1: Invoice & Booking Reference */}
         <div>
@@ -253,20 +235,20 @@ const TransportEntry = () => {
                   value={formData.invoice_no}
                   onChange={handleInputChange}
                   placeholder="e.g. 1001"
-                  className="w-full px-3 py-2 text-sm outline-none bg-white font-mono"
+                  className="w-full px-3 py-2.5 text-sm outline-none bg-white font-mono"
                 />
                 <button
                   type="button"
                   onClick={handleInvoiceLookup}
                   disabled={lookupLoading}
-                  className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 text-xs font-bold border-l border-slate-300 flex items-center gap-1 shrink-0 cursor-pointer transition-colors disabled:opacity-50"
+                  className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2.5 text-xs font-bold border-l border-slate-300 flex items-center gap-1.5 shrink-0 cursor-pointer transition-colors disabled:opacity-50"
                   title="Auto-fill details from Outward Bill"
                 >
                   <FiSearch className="text-xs" />
-                  <span>{lookupLoading ? '...' : 'Fetch'}</span>
+                  <span>{lookupLoading ? 'Fetching...' : 'Fetch'}</span>
                 </button>
               </div>
-              <p className="text-[10px] text-slate-400 mt-1">Type bill no and click Fetch to autofill</p>
+              <p className="text-[10px] text-slate-400 mt-1">Type bill number and click Fetch to autofill customer details</p>
             </div>
 
             {/* Booking Date */}
@@ -280,7 +262,7 @@ const TransportEntry = () => {
                 value={formData.booking_date}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white"
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white"
               />
             </div>
 
@@ -293,7 +275,7 @@ const TransportEntry = () => {
                 name="status"
                 value={formData.status}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 text-sm border rounded-lg outline-none font-bold ${
+                className={`w-full px-3 py-2.5 text-sm border rounded-lg outline-none font-bold ${
                   formData.status === 'Finished' || formData.status === 'Delivered'
                     ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
                     : formData.status === 'In Transit'
@@ -310,127 +292,10 @@ const TransportEntry = () => {
           </div>
         </div>
 
-        {/* Section 2: Transport & LR Details */}
+        {/* Section 2: Customer / Consignee Information (2nd) */}
         <div>
           <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2">
-            <FiTruck className="text-blue-700" /> 2. Transport & LR Details
-          </h2>
-
-          <div className="space-y-4">
-            
-            {/* Quick Transport Chips */}
-            <div>
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                Quick Select Popular Transports:
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {POPULAR_TRANSPORTS.map((transport) => (
-                  <button
-                    key={transport}
-                    type="button"
-                    onClick={() => handleSelectTransport(transport)}
-                    className={`text-xs px-2.5 py-1 rounded-md font-medium transition-all cursor-pointer border ${
-                      formData.transport_name === transport
-                        ? 'bg-blue-700 text-white border-blue-700 shadow-sm'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
-                    }`}
-                  >
-                    {transport}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              
-              {/* Transport Name */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Transport Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="transport_name"
-                  value={formData.transport_name}
-                  onChange={handleInputChange}
-                  placeholder="e.g. VRL / ABT / ARC"
-                  required
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-medium"
-                />
-              </div>
-
-              {/* Transport City / Destination */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Transport City / Branch <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="transport_city"
-                  value={formData.transport_city}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Chennai, Coimbatore, Madurai"
-                  required
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-medium"
-                />
-              </div>
-
-              {/* LR No */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  LR Number / GC No
-                </label>
-                <input
-                  type="text"
-                  name="lr_no"
-                  value={formData.lr_no}
-                  onChange={handleInputChange}
-                  placeholder="e.g. LR-987452"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-mono font-bold text-slate-900"
-                />
-              </div>
-
-              {/* No of Parcels */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <FiPackage className="text-slate-400" /> No. of Parcels / Bundles
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  name="parcels"
-                  value={formData.parcels}
-                  onChange={handleInputChange}
-                  placeholder="1"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-bold"
-                />
-              </div>
-
-              {/* Remarks / Contact */}
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Remarks / Tracking Notes (Optional)
-                </label>
-                <input
-                  type="text"
-                  name="remarks"
-                  value={formData.remarks}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Direct booking, Door delivery requested, Call on arrival"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white"
-                />
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-
-        {/* Section 3: Customer / Consignee Details */}
-        <div>
-          <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2">
-            <FiUser className="text-blue-700" /> 3. Customer / Consignee Information
+            <FiUser className="text-blue-700" /> 2. Customer / Consignee Information
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -447,7 +312,7 @@ const TransportEntry = () => {
                 onChange={handleInputChange}
                 placeholder="Customer full name"
                 required
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-medium"
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-medium"
               />
             </div>
 
@@ -463,7 +328,7 @@ const TransportEntry = () => {
                 onChange={handleInputChange}
                 placeholder="10-digit mobile number"
                 required
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-medium"
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-medium"
               />
             </div>
 
@@ -477,9 +342,99 @@ const TransportEntry = () => {
                 value={formData.customer_address}
                 onChange={handleInputChange}
                 rows="2"
-                placeholder="Delivery address / locality"
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white"
+                placeholder="Delivery address / locality / landmark"
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white"
               ></textarea>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Section 3: Transport & LR Details (3rd) */}
+        <div>
+          <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2">
+            <FiTruck className="text-blue-700" /> 3. Transport & LR Details
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            
+            {/* Transport Name */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Transport Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="transport_name"
+                value={formData.transport_name}
+                onChange={handleInputChange}
+                placeholder="e.g. Jeyam Lorry / VRL / ABT"
+                required
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-medium"
+              />
+            </div>
+
+            {/* Transport City / Destination */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Transport City / Branch <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="transport_city"
+                value={formData.transport_city}
+                onChange={handleInputChange}
+                placeholder="e.g. Virudhunagar / Chennai / Madurai"
+                required
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-medium"
+              />
+            </div>
+
+            {/* LR No */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                LR Number / GC No
+              </label>
+              <input
+                type="text"
+                name="lr_no"
+                value={formData.lr_no}
+                onChange={handleInputChange}
+                placeholder="e.g. 4693 / LR-987452"
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-mono font-bold text-slate-900"
+              />
+            </div>
+
+            {/* No of Parcels */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center gap-1">
+                <FiPackage className="text-slate-400" /> No. of Parcels / Bundles
+              </label>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                name="parcels"
+                value={formData.parcels}
+                onChange={handleInputChange}
+                placeholder="1"
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white font-bold"
+              />
+            </div>
+
+            {/* Remarks / Contact */}
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Remarks / Tracking Notes (Optional)
+              </label>
+              <input
+                type="text"
+                name="remarks"
+                value={formData.remarks}
+                onChange={handleInputChange}
+                placeholder="e.g. Direct booking, Door delivery requested, Call on arrival"
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white"
+              />
             </div>
 
           </div>

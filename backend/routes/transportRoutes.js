@@ -83,12 +83,16 @@ router.get('/', protect, async (req, res) => {
 router.get('/lookup/:invoiceNo', protect, async (req, res) => {
   try {
     const connection = await pool.getConnection();
-    const invoiceNo = req.params.invoiceNo;
+    const rawInvoice = (req.params.invoiceNo || '').trim();
+    const numericPart = parseInt(rawInvoice.replace(/\D/g, '')) || null;
 
-    // Try finding in outward_bills by bill_no or id
+    // Try finding in outward_bills by bill_no, numeric bill_no, id, or like
     const [bills] = await connection.query(
-      'SELECT bill_no, bill_date, customer_name, phone_number, address, city, grand_total, total_items FROM outward_bills WHERE bill_no = ? OR id = ? LIMIT 1',
-      [invoiceNo, invoiceNo]
+      `SELECT bill_no, bill_date, customer_name, phone_number, address, city, grand_total, total_items 
+       FROM outward_bills 
+       WHERE bill_no = ? OR (bill_no = ? AND ? IS NOT NULL) OR (id = ? AND ? IS NOT NULL) OR bill_no LIKE ? 
+       ORDER BY id DESC LIMIT 1`,
+      [rawInvoice, numericPart, numericPart, numericPart, numericPart, `%${rawInvoice}%`]
     );
 
     connection.release();
@@ -98,7 +102,7 @@ router.get('/lookup/:invoiceNo', protect, async (req, res) => {
       return res.json({
         success: true,
         data: {
-          invoice_no: bill.bill_no || invoiceNo,
+          invoice_no: bill.bill_no || rawInvoice,
           customer_name: bill.customer_name || '',
           customer_phone: bill.phone_number || '',
           customer_address: bill.address || '',
