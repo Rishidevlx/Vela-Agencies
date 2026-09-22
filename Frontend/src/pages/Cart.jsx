@@ -282,7 +282,7 @@ const Cart = () => {
                       type="text" 
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="e.g. Rishi Aravindha" 
+                      placeholder="Enter Customer Name" 
                       className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-xs sm:text-sm font-medium text-gray-800 shadow-xs"
                       required
                     />
@@ -301,7 +301,7 @@ const Cart = () => {
                           const val = e.target.value.replace(/\D/g, '');
                           if (val.length <= 10) setMobileNumber(val);
                         }}
-                        placeholder="10-digit number" 
+                        placeholder="Enter 10-digit mobile number" 
                         className="flex-1 w-full px-2.5 py-2 bg-transparent outline-none text-xs sm:text-sm font-medium text-gray-800 placeholder-gray-400"
                         required
                       />
@@ -315,7 +315,7 @@ const Cart = () => {
                   <textarea 
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Street / Door No / Landmark / Area..." 
+                    placeholder="Enter complete delivery address (Street, Door No, Landmark, Area)..." 
                     rows="2"
                     className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-xs sm:text-sm font-medium text-gray-800 shadow-xs resize-none"
                     required
@@ -330,7 +330,7 @@ const Cart = () => {
                       type="text" 
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder="e.g. Sivakasi, Madurai" 
+                      placeholder="Enter City / Town / State" 
                       className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-xs sm:text-sm font-medium text-gray-800 shadow-xs"
                       required
                     />
@@ -341,7 +341,7 @@ const Cart = () => {
                       type="text" 
                       value={pincode}
                       onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="6-digits" 
+                      placeholder="Enter 6-digit Pincode" 
                       className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-xs sm:text-sm font-medium text-gray-800 shadow-xs"
                       required
                     />

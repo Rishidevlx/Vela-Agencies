@@ -4,8 +4,10 @@ import toast from 'react-hot-toast';
 import { 
   FiTruck, FiPlus, FiSearch, FiPrinter, FiEdit2, FiTrash2, 
   FiClock, FiCheckCircle, FiCalendar, FiFilter, FiRefreshCw, 
-  FiAlertCircle, FiX, FiCheck, FiPackage, FiPhone, FiMapPin 
+  FiAlertCircle, FiX, FiCheck, FiPackage, FiPhone, FiMapPin,
+  FiSend
 } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import TransportSlipModal from '../../components/transport/TransportSlipModal';
 
 // Safe date formatter (eliminates timezone shift)
@@ -46,6 +48,9 @@ const TransportReport = () => {
 
   // Delete Modal State
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, invoice_no: '', customer_name: '' });
+
+  // WhatsApp Sending State
+  const [sendingWhatsappId, setSendingWhatsappId] = useState(null);
 
   // Fetch Entries from Backend
   const fetchEntries = async () => {
@@ -170,6 +175,58 @@ const TransportReport = () => {
     } catch (err) {
       console.error(err);
       toast.error('Error deleting transport entry');
+    }
+  };
+
+  // Generate Transport Slip PDF & Share via WhatsApp
+  const handleSendWhatsApp = async (item) => {
+    try {
+      setSendingWhatsappId(item.id);
+      const token = localStorage.getItem('adminToken');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transport/${item.id}/whatsapp-slip`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!data.success || !data.data?.slip_url) {
+        toast.error(data.message || 'Failed to generate transport slip link');
+        return;
+      }
+
+      const slipUrl = data.data.slip_url;
+      const rawPhone = (item.customer_phone || '').replace(/\D/g, '');
+      const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+      const storePhone = data.data.storeDetails?.phone1 || '+91 93639 53616';
+
+      const message = 
+`🚚 *VELA AGENCIES - TRANSPORT DISPATCH SLIP* 🚚
+-----------------------------------------
+Dear *${item.customer_name || 'Customer'}*,
+Your crackers consignment (Inv #${item.invoice_no || 'N/A'}) has been dispatched via transport!
+
+📦 *Transport:* ${item.transport_name || '-'}
+📍 *Destination:* ${item.transport_city || '-'}
+🏷️ *LR / GC No:* ${item.lr_no || 'N/A'}
+📦 *Total Parcels:* ${item.parcels || 1} Box/Bundle(s)
+📅 *Booking Date:* ${formatDateSafe(item.booking_date)}
+
+📄 *Download Transport Delivery Slip PDF:*
+${slipUrl}
+
+⚠️ *Important Instructions:*
+Please carry your ID proof & this LR Number when collecting goods from the transport branch office.
+
+Thank you for choosing *Vela Agencies Sivakasi*! 🎇
+📞 Support: ${storePhone}`;
+
+      const waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
+      toast.success('Transport Slip generated & WhatsApp opened!');
+    } catch (err) {
+      console.error('Error sending WhatsApp slip:', err);
+      toast.error('Failed to generate WhatsApp slip');
+    } finally {
+      setSendingWhatsappId(null);
     }
   };
 
@@ -345,9 +402,9 @@ const TransportReport = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             
-            {/* Table Header */}
+            {/* Table Header (Royal Blue) */}
             <thead>
-              <tr className="bg-slate-900 text-white font-heading font-black tracking-wider uppercase text-[11px] border-b border-slate-800">
+              <tr className="bg-[#1e40af] text-white font-heading font-black tracking-wider uppercase text-[11px] border-b border-blue-900">
                 <th className="py-3 px-3 w-12 text-center">#</th>
                 <th className="py-3 px-3">Inv No</th>
                 <th className="py-3 px-3">Date</th>
@@ -357,7 +414,7 @@ const TransportReport = () => {
                 <th className="py-3 px-3 font-mono">LR Number</th>
                 <th className="py-3 px-3 text-center">Parcels</th>
                 <th className="py-3 px-3 text-center">Status</th>
-                <th className="py-3 px-3 text-center w-32">Actions</th>
+                <th className="py-3 px-3 text-center w-36">Actions</th>
               </tr>
             </thead>
 
@@ -380,6 +437,7 @@ const TransportReport = () => {
                 paginatedEntries.map((item, idx) => {
                   const itemIndex = (currentPage - 1) * itemsPerPage + idx + 1;
                   const dateFormatted = formatDateSafe(item.booking_date);
+                  const isSendingWa = sendingWhatsappId === item.id;
 
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
@@ -466,6 +524,20 @@ const TransportReport = () => {
                       <td className="py-3 px-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           
+                          {/* WhatsApp Slip Button (Generates PDF + opens WhatsApp) */}
+                          <button
+                            onClick={() => handleSendWhatsApp(item)}
+                            disabled={isSendingWa}
+                            className="p-1.5 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition-colors cursor-pointer border border-emerald-200 disabled:opacity-50"
+                            title="Send Transport Slip PDF via WhatsApp"
+                          >
+                            {isSendingWa ? (
+                              <FiRefreshCw className="animate-spin text-sm" />
+                            ) : (
+                              <FaWhatsapp className="text-sm text-[#25D366]" />
+                            )}
+                          </button>
+
                           {/* Print Slip Button */}
                           <button
                             onClick={() => setSelectedSlipEntry(item)}

@@ -50,7 +50,12 @@ const TransportSlipModal = ({ entry, onClose }) => {
   if (!entry) return null;
 
   const handlePrint = () => {
+    const originalTitle = document.title;
+    document.title = '';
     window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 500);
   };
 
   const formattedBookingDate = formatDateSafe(entry.booking_date);
@@ -62,7 +67,7 @@ const TransportSlipModal = ({ entry, onClose }) => {
       <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Modal Top Action Bar (Hidden in Print) */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#2F415D] text-white shrink-0 print:hidden">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#1e3a8a] text-white shrink-0 print:hidden">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-yellow-400">
               <FiTruck className="text-xl" />
@@ -91,26 +96,23 @@ const TransportSlipModal = ({ entry, onClose }) => {
         </div>
 
         {/* Printable Transport Slip Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-100/60 print:bg-white print:p-0 print:overflow-visible">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-100/60 print:bg-white print:p-0 print:overflow-visible flex justify-center">
           
           <div 
             ref={printRef}
-            className="printable-transport-slip bg-white border-2 border-slate-400 rounded-xl p-6 sm:p-8 max-w-2xl mx-auto shadow-sm print:border-2 print:border-black print:rounded-none print:shadow-none print:p-6 text-slate-900 font-body"
+            className="printable-transport-slip bg-white border-2 border-slate-700 rounded-xl p-6 sm:p-8 w-full max-w-2xl mx-auto shadow-sm print:border-2 print:border-black print:rounded-none print:shadow-none print:p-6 print:mx-auto text-slate-900 font-body"
           >
             
-            {/* Header: Company Details & Authentic Vela Agencies Logo */}
+            {/* Header: Company Details & Authentic Vela Agencies Logo (Centered & Balanced) */}
             <div className="flex flex-row items-center justify-between pb-4 border-b-2 border-slate-900 gap-4">
               <div className="flex items-center gap-4">
                 <img 
                   src={logoImg} 
                   alt="Vela Agencies" 
-                  className="h-16 w-auto max-w-[140px] object-contain shrink-0 drop-shadow-sm" 
+                  className="h-16 w-auto max-w-[150px] object-contain shrink-0 drop-shadow-sm" 
                 />
                 <div>
-                  <h1 className="text-2xl font-black font-heading text-[#C70E17] tracking-tight leading-none uppercase">
-                    VELA AGENCIES
-                  </h1>
-                  <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider mt-1">
+                  <p className="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">
                     Wholesale Fireworks & Sivakasi Green Crackers Suppliers
                   </p>
                   <p className="text-[10px] text-slate-600 mt-1 max-w-xs leading-snug">
@@ -138,7 +140,7 @@ const TransportSlipModal = ({ entry, onClose }) => {
             </div>
 
             {/* Document Title Banner */}
-            <div className="my-3.5 bg-[#2F415D] text-white text-center py-2 rounded font-heading font-black tracking-widest text-xs uppercase flex items-center justify-between px-4 print:bg-black print:text-white">
+            <div className="my-3.5 bg-[#1e3a8a] text-white text-center py-2 rounded font-heading font-black tracking-widest text-xs uppercase flex items-center justify-between px-4 print:bg-black print:text-white">
               <span>TRANSPORT DISPATCH CHALLAN / DELIVERY SLIP</span>
               <span className="text-yellow-400 font-mono text-[11px] font-bold">
                 STATUS: {entry.status?.toUpperCase() || 'FINISHED'}
@@ -221,8 +223,8 @@ const TransportSlipModal = ({ entry, onClose }) => {
             </div>
 
             {/* Note & Verification Block */}
-            <div className="border border-dashed border-slate-300 rounded-lg p-3 my-3 bg-amber-50/50 print:bg-white text-[10px] text-slate-700 leading-relaxed">
-              <p className="font-bold text-slate-900 mb-0.5">⚠️ Important Consignee Instructions:</p>
+            <div className="border border-dashed border-slate-300 rounded-lg p-3.5 my-3.5 bg-amber-50/50 print:bg-white text-[10.5px] text-slate-700 leading-relaxed">
+              <p className="font-bold text-slate-900 mb-1">⚠️ Important Consignee Instructions:</p>
               <ul className="list-disc pl-4 space-y-0.5">
                 <li>Please bring original ID proof and this LR details when collecting goods from the transport branch office.</li>
                 <li>Verify the total number of parcels/bundles ({entry.parcels || 1} units) before acknowledging receipt.</li>
@@ -230,32 +232,11 @@ const TransportSlipModal = ({ entry, onClose }) => {
               </ul>
             </div>
 
-            {/* Signatures & Seal Section */}
-            <div className="grid grid-cols-2 gap-8 pt-8 mt-6 border-t-2 border-slate-900 text-xs">
-              <div className="text-center">
-                <div className="h-10 flex items-end justify-center">
-                  <div className="w-40 border-b border-slate-400"></div>
-                </div>
-                <p className="font-bold text-slate-800 mt-1 uppercase text-[11px]">Consignee / Receiver's Signature</p>
-                <p className="text-[10px] text-slate-400">Parcel Received in Good Condition</p>
-              </div>
-
-              <div className="text-center">
-                <div className="h-10 flex items-end justify-center">
-                  <span className="font-heading font-black text-[#C70E17] text-xs tracking-wider">
-                    VELA AGENCIES
-                  </span>
-                </div>
-                <p className="font-bold text-slate-900 mt-1 uppercase text-[11px]">For VELA AGENCIES</p>
-                <p className="text-[10px] text-slate-500">Authorized Signatory / Dispatch Officer</p>
-              </div>
-            </div>
-
             {/* Bottom Barcode / Reference Strip */}
-            <div className="mt-5 pt-2.5 border-t border-slate-200 flex justify-between items-center text-[9px] text-slate-400 uppercase tracking-widest font-mono">
+            <div className="mt-6 pt-3 border-t border-slate-300 flex justify-between items-center text-[9.5px] text-slate-500 uppercase tracking-widest font-mono">
               <span>DOC-ID: TRP-{String(entry.id).padStart(5, '0')}</span>
               <span>LR: {entry.lr_no || 'N/A'}</span>
-              <span>Vela Agencies Sivakasi</span>
+              <span>VELA AGENCIES SIVAKASI</span>
             </div>
 
           </div>
@@ -285,7 +266,16 @@ const TransportSlipModal = ({ entry, onClose }) => {
 
       {/* Print Specific CSS */}
       <style>{`
+        @page {
+          size: A4 portrait;
+          margin: 8mm;
+        }
         @media print {
+          html, body {
+            background: #ffffff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
           body * {
             visibility: hidden;
           }
@@ -295,10 +285,12 @@ const TransportSlipModal = ({ entry, onClose }) => {
           .printable-transport-slip {
             position: absolute;
             left: 0;
+            right: 0;
             top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 20px;
+            margin: 0 auto !important;
+            width: 96% !important;
+            max-width: 680px !important;
+            padding: 20px !important;
           }
         }
       `}</style>

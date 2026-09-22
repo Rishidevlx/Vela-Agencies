@@ -563,7 +563,7 @@ const OutwardBilling = () => {
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Customer / Client Name <span className="text-red-500">*</span></label>
                 <input
                   type="text"
-                  placeholder="e.g. Rishi Aravindha"
+                  placeholder="Enter customer name"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
@@ -576,7 +576,7 @@ const OutwardBilling = () => {
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Mobile / Phone (10-Digits) <span className="text-red-500">*</span></label>
                 <input
                   type="text"
-                  placeholder="e.g. 9876543210"
+                  placeholder="Enter 10-digit mobile number"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
@@ -589,7 +589,7 @@ const OutwardBilling = () => {
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Billing / Delivery Address <span className="text-red-500">*</span></label>
                 <textarea
                   rows="2"
-                  placeholder="Enter complete address (Street, Door No, Landmark, Area)..."
+                  placeholder="Enter complete delivery address (Street, Door No, Landmark, Area)..."
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm resize-y"
@@ -602,7 +602,7 @@ const OutwardBilling = () => {
                 <label className="block text-xs font-semibold text-slate-700 mb-1">City / Town / State <span className="text-red-500">*</span></label>
                 <input
                   type="text"
-                  placeholder="e.g. Sivakasi, Madurai, Tamil Nadu"
+                  placeholder="Enter City / Town / State"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
@@ -615,7 +615,7 @@ const OutwardBilling = () => {
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Pincode (6-Digits) <span className="text-red-500">*</span></label>
                 <input
                   type="text"
-                  placeholder="e.g. 626123"
+                  placeholder="Enter 6-digit pincode"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"

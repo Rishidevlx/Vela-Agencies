@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const protect = require('../middleware/authMiddleware');
+const generateTransportSlip = require('../utils/generateTransportSlip');
 
 // Ensure Table Exists Helper
 const ensureTransportTable = async (connection) => {
@@ -19,11 +20,19 @@ const ensureTransportTable = async (connection) => {
       booking_date DATE,
       status VARCHAR(50) DEFAULT 'Pending',
       remarks TEXT,
+      slip_url VARCHAR(500),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `;
   await connection.query(createTableQuery);
+
+  // Ensure slip_url column exists if table was created previously without it
+  try {
+    await connection.query("ALTER TABLE transport_entries ADD COLUMN slip_url VARCHAR(500)");
+  } catch (err) {
+    // Column already exists, ignore
+  }
 };
 
 // @desc    Get all transport entries
@@ -321,6 +330,64 @@ router.patch('/:id/status', protect, async (req, res) => {
   } catch (error) {
     console.error('Error updating status:', error);
     res.status(500).json({ success: false, message: 'Server error updating status' });
+  }
+});
+
+// @desc    Generate Transport Slip PDF and upload to Cloudinary for WhatsApp
+// @route   POST /api/transport/:id/whatsapp-slip
+// @access  Private (Admin)
+router.post('/:id/whatsapp-slip', protect, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    await ensureTransportTable(connection);
+
+    const [rows] = await connection.query(
+      "SELECT id, invoice_no, transport_name, transport_city, customer_name, customer_phone, customer_address, lr_no, parcels, DATE_FORMAT(booking_date, '%Y-%m-%d') as booking_date, status, remarks, slip_url FROM transport_entries WHERE id = ?",
+      [req.params.id]
+    );
+
+    if (rows.length === 0) {
+      connection.release();
+      return res.status(404).json({ success: false, message: 'Transport entry not found' });
+    }
+
+    const entry = rows[0];
+
+    // Fetch CMS store contact details
+    let storeDetails = {};
+    try {
+      const [cmsRows] = await connection.query("SELECT cms_value FROM home_cms WHERE cms_key = 'contact_details'");
+      if (cmsRows.length > 0 && cmsRows[0].cms_value) {
+        storeDetails = typeof cmsRows[0].cms_value === 'string' ? JSON.parse(cmsRows[0].cms_value) : cmsRows[0].cms_value;
+      }
+    } catch (e) {
+      console.error('Error fetching CMS details:', e);
+    }
+
+    // Generate PDF & upload to Cloudinary
+    const slip_url = await generateTransportSlip(entry, storeDetails);
+
+    // Save slip_url in database
+    try {
+      await connection.query('UPDATE transport_entries SET slip_url = ? WHERE id = ?', [slip_url, req.params.id]);
+    } catch (e) {
+      console.error('Error saving slip_url in DB:', e);
+    }
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: 'Transport slip generated successfully',
+      data: {
+        ...entry,
+        slip_url,
+        storeDetails
+      }
+    });
+  } catch (error) {
+    console.error('Error generating WhatsApp transport slip:', error);
+    res.status(500).json({ success: false, message: 'Failed to generate transport slip PDF' });
   }
 });
 
