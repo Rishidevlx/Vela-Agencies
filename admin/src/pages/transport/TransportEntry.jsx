@@ -185,17 +185,17 @@ const TransportEntry = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-[#f8fafc] min-h-screen font-body text-slate-800">
+    <div className="p-2 sm:p-5 lg:p-8 bg-[#f8fafc] min-h-screen font-body text-slate-800 w-full max-w-7xl mx-auto overflow-x-hidden">
       
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700 shadow-sm shrink-0">
               <FiTruck className="text-xl" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold font-heading text-slate-900 tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold font-heading text-slate-900 tracking-tight">
                 {editId ? 'Edit Transport Entry' : 'Transport Dispatch Entry'}
               </h1>
               <p className="text-xs text-slate-500">Record shipment dispatches, LR numbers, and delivery details</p>
@@ -205,7 +205,7 @@ const TransportEntry = () => {
 
         <Link
           to="/dashboard/transport/report"
-          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-lg text-xs uppercase tracking-wider transition-all shadow-sm cursor-pointer w-fit"
+          className="flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-lg text-xs uppercase tracking-wider transition-all shadow-sm cursor-pointer w-full sm:w-fit"
         >
           <FiList className="text-sm text-blue-700" />
           <span>View Transport Reports</span>
@@ -213,15 +213,15 @@ const TransportEntry = () => {
       </div>
 
       {/* Main Form Container - Full Width */}
-      <form onSubmit={handleSubmit} className="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-8">
+      <form onSubmit={handleSubmit} className="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
         
         {/* Section 1: Invoice & Booking Reference */}
         <div>
-          <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 border-b border-slate-200 pb-2 mb-3 sm:mb-4 flex items-center gap-2">
             <FiFileText className="text-blue-700" /> 1. Invoice & Booking Reference
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             
             {/* Invoice No with Lookup */}
             <div>

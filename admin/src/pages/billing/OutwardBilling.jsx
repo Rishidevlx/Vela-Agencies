@@ -471,13 +471,13 @@ const OutwardBilling = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-[#f8fafc] min-h-screen font-body text-slate-800">
+    <div className="p-2 sm:p-5 lg:p-8 bg-[#f8fafc] min-h-screen font-body text-slate-800 pb-24 lg:pb-8 w-full max-w-7xl mx-auto overflow-x-hidden">
       
-      {/* Top Header & Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold font-heading text-slate-900 tracking-tight">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl sm:text-2xl font-bold font-heading text-slate-900 tracking-tight">
               {editId ? `Edit Invoice #${existingBillNo || ''}` : 'Create New Invoice (Outward)'}
             </h1>
             {editId && (
@@ -492,8 +492,8 @@ const OutwardBilling = () => {
         </div>
 
         {/* Shortcuts Tag & Action Buttons */}
-        <div className="flex items-center flex-wrap gap-2.5">
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded text-[11px] text-slate-600 font-mono">
+        <div className="flex items-center flex-wrap gap-2 sm:gap-2.5">
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded text-[11px] text-slate-600 font-mono">
             <span><strong className="text-slate-800">Ctrl+Enter</strong> Save</span>
             <span>|</span>
             <span><strong className="text-slate-800">Alt+A</strong> Add Item</span>
@@ -504,14 +504,14 @@ const OutwardBilling = () => {
           <button
             type="button"
             onClick={handleResetForm}
-            className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold rounded shadow-sm transition-colors cursor-pointer"
+            className="flex-1 sm:flex-none text-center px-3 sm:px-4 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold rounded shadow-sm transition-colors cursor-pointer"
           >
             Reset Form
           </button>
 
           <Link
             to="/dashboard/billing/list"
-            className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold rounded shadow-sm transition-colors cursor-pointer"
+            className="flex-1 sm:flex-none text-center px-3 sm:px-4 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold rounded shadow-sm transition-colors cursor-pointer"
           >
             View Outward List
           </Link>
@@ -520,7 +520,7 @@ const OutwardBilling = () => {
             type="button"
             onClick={handleSubmitBill}
             disabled={isSubmitting}
-            className="px-5 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded shadow transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full sm:w-auto px-4 sm:px-5 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded shadow transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? 'Saving Bill...' : (editId ? 'Update & Save (Ctrl+Enter)' : 'Save Invoice (Ctrl+Enter)')}
           </button>
@@ -528,14 +528,14 @@ const OutwardBilling = () => {
       </div>
 
       {/* Main Form Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         
         {/* Left 8 Cols: Customer Details & Items Table */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
+        <div className="lg:col-span-8 flex flex-col gap-5 sm:gap-6">
           
           {/* Customer Details Card (All Fields Required) */}
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-3.5 sm:p-5">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 mb-3 sm:mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-blue-700 rounded-full"></span>
                 BILL TO / CUSTOMER DETAILS
@@ -545,7 +545,7 @@ const OutwardBilling = () => {
               </span>
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               {/* Bill Date */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Invoice Date <span className="text-red-500">*</span></label>
@@ -553,7 +553,7 @@ const OutwardBilling = () => {
                   type="date"
                   value={billDate}
                   onChange={(e) => setBillDate(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
+                  className="w-full bg-white border border-slate-300 rounded py-2 px-3 text-xs sm:text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
                   required
                 />
               </div>
@@ -566,7 +566,7 @@ const OutwardBilling = () => {
                   placeholder="Enter customer name"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
+                  className="w-full bg-white border border-slate-300 rounded py-2 px-3 text-xs sm:text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
                   required
                 />
               </div>
@@ -579,7 +579,7 @@ const OutwardBilling = () => {
                   placeholder="Enter 10-digit mobile number"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
+                  className="w-full bg-white border border-slate-300 rounded py-2 px-3 text-xs sm:text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
                   required
                 />
               </div>
@@ -592,7 +592,7 @@ const OutwardBilling = () => {
                   placeholder="Enter complete delivery address (Street, Door No, Landmark, Area)..."
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm resize-y"
+                  className="w-full bg-white border border-slate-300 rounded py-2 px-3 text-xs sm:text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm resize-y"
                   required
                 />
               </div>
@@ -605,7 +605,7 @@ const OutwardBilling = () => {
                   placeholder="Enter City / Town / State"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
+                  className="w-full bg-white border border-slate-300 rounded py-2 px-3 text-xs sm:text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
                   required
                 />
               </div>
@@ -618,7 +618,7 @@ const OutwardBilling = () => {
                   placeholder="Enter 6-digit pincode"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
+                  className="w-full bg-white border border-slate-300 rounded py-2 px-3 text-xs sm:text-sm font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
                   required
                 />
               </div>
@@ -626,8 +626,8 @@ const OutwardBilling = () => {
           </div>
 
           {/* Product Items Table Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-3 sm:p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 flex items-center gap-2">
                 <span className="w-2 h-2 bg-blue-700 rounded-full"></span>
                 INVOICE LINE ITEMS ({items.length})
@@ -636,23 +636,23 @@ const OutwardBilling = () => {
               <button
                 type="button"
                 onClick={addItemRow}
-                className="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded transition-colors cursor-pointer shadow-sm"
+                className="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded transition-colors cursor-pointer shadow-sm flex items-center gap-1"
               >
                 + Add Line Item (Alt+A)
               </button>
             </div>
 
-            {/* Clean Table with Dropdown Visibility */}
-            <div className="p-4 overflow-visible">
-              <table className="w-full text-left text-sm border-collapse">
+            {/* Clean Horizontal-Scrollable Table Container */}
+            <div className="overflow-x-auto w-full p-2 sm:p-4 scrollbar-thin">
+              <table className="w-full text-left text-sm border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-slate-100 text-slate-700 uppercase text-xs font-bold border-b border-slate-200">
                     <th className="py-2.5 px-2 w-10 text-center">#</th>
-                    <th className="py-2.5 px-3 min-w-[280px]">Item Name *</th>
-                    <th className="py-2.5 px-3 w-32 text-right">Rate (₹)</th>
-                    <th className="py-2.5 px-3 w-28 text-center">Quantity</th>
-                    <th className="py-2.5 px-2 w-20 text-center">Unit</th>
-                    <th className="py-2.5 px-3 w-32 text-right">Amount (₹)</th>
+                    <th className="py-2.5 px-3 min-w-[260px]">Item Name *</th>
+                    <th className="py-2.5 px-3 w-28 text-right">Rate (₹)</th>
+                    <th className="py-2.5 px-3 w-24 text-center">Quantity</th>
+                    <th className="py-2.5 px-2 w-16 text-center">Unit</th>
+                    <th className="py-2.5 px-3 w-28 text-right">Amount (₹)</th>
                     <th className="py-2.5 px-2 w-10 text-center"></th>
                   </tr>
                 </thead>
@@ -685,7 +685,7 @@ const OutwardBilling = () => {
                           step="0.01"
                           value={item.price}
                           onChange={(e) => handlePriceChange(index, e.target.value)}
-                          className="w-28 bg-white border border-slate-300 rounded py-2.5 px-2.5 text-sm font-bold text-right text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
+                          className="w-24 sm:w-28 bg-white border border-slate-300 rounded py-2 px-2 text-xs sm:text-sm font-bold text-right text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
                         />
                       </td>
 
@@ -705,18 +705,18 @@ const OutwardBilling = () => {
                               }
                             }
                           }}
-                          className="w-20 bg-white border border-slate-300 rounded py-2.5 px-2 text-sm font-bold text-center text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
+                          className="w-18 sm:w-20 bg-white border border-slate-300 rounded py-2 px-2 text-xs sm:text-sm font-bold text-center text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
                         />
                       </td>
 
                       {/* Unit */}
-                      <td className="py-2.5 px-2 text-center text-slate-600 text-xs font-semibold uppercase">
+                      <td className="py-2.5 px-2 text-center text-slate-600 text-[11px] font-semibold uppercase">
                         {item.unit || 'pkt'}
                       </td>
 
                       {/* Line Total Badge */}
                       <td className="py-2.5 px-3 text-right">
-                        <div className="bg-emerald-50 border border-emerald-200/80 rounded py-2 px-2.5 font-bold text-emerald-900 text-sm">
+                        <div className="bg-emerald-50 border border-emerald-200/80 rounded py-1.5 px-2 font-bold text-emerald-900 text-xs sm:text-sm whitespace-nowrap">
                           ₹{(parseFloat(item.total) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                       </td>
@@ -739,7 +739,7 @@ const OutwardBilling = () => {
             </div>
 
             {/* Bottom row actions */}
-            <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+            <div className="p-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
               <button
                 type="button"
                 onClick={addItemRow}
@@ -758,18 +758,18 @@ const OutwardBilling = () => {
 
         {/* Right 4 Cols: INVOICE SUMMARY */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 mb-4 border-b border-slate-200 pb-3 flex items-center justify-between">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 sm:p-5 sticky top-20">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-blue-900 mb-3 sm:mb-4 border-b border-slate-200 pb-2.5 flex items-center justify-between">
               <span>INVOICE SUMMARY</span>
               {existingBillNo && (
                 <span className="font-mono text-blue-700">INV/#{existingBillNo}</span>
               )}
             </h2>
 
-            <div className="space-y-4 text-sm">
+            <div className="space-y-3.5 sm:space-y-4 text-sm">
               
               {/* Itemized List in Summary */}
-              <div className="border border-slate-100 rounded-lg p-3 bg-slate-50/70 max-h-56 overflow-y-auto space-y-2">
+              <div className="border border-slate-100 rounded-lg p-3 bg-slate-50/70 max-h-48 sm:max-h-56 overflow-y-auto space-y-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
                   Selected Items ({validItems.length})
                 </span>
@@ -797,15 +797,15 @@ const OutwardBilling = () => {
 
               {/* Subtotal */}
               <div className="flex justify-between items-center text-slate-700 pt-1">
-                <span className="font-medium">Subtotal ({totalItemsCount} items)</span>
-                <span className="font-bold text-slate-900 text-base">
+                <span className="font-medium text-xs sm:text-sm">Subtotal ({totalItemsCount} items)</span>
+                <span className="font-bold text-slate-900 text-sm sm:text-base">
                   ₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
 
               {/* Discount */}
-              <div className="flex justify-between items-center gap-2 pt-3 border-t border-slate-200">
-                <span className="font-medium text-slate-700">Discount (₹)</span>
+              <div className="flex justify-between items-center gap-2 pt-2.5 border-t border-slate-200">
+                <span className="font-medium text-xs sm:text-sm text-slate-700">Discount (₹)</span>
                 <input
                   type="number"
                   min="0"
@@ -813,35 +813,35 @@ const OutwardBilling = () => {
                   value={discount}
                   onChange={(e) => setDiscount(Math.max(0, parseFloat(e.target.value) || 0))}
                   placeholder="0.00"
-                  className="w-32 bg-white border border-slate-300 rounded py-2 px-3 text-right font-bold text-sm text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
+                  className="w-28 sm:w-32 bg-white border border-slate-300 rounded py-1.5 sm:py-2 px-3 text-right font-bold text-xs sm:text-sm text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
                 />
               </div>
 
               {/* Grand Total Box */}
-              <div className="bg-blue-800 text-white rounded-lg p-4 shadow-md">
+              <div className="bg-blue-800 text-white rounded-lg p-3.5 sm:p-4 shadow-md">
                 <span className="text-xs uppercase tracking-wider font-semibold opacity-90 block">
                   Grand Total
                 </span>
-                <div className="text-3xl font-extrabold font-heading mt-1">
+                <div className="text-2xl sm:text-3xl font-extrabold font-heading mt-0.5">
                   ₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
               </div>
 
               {/* Amount In Words */}
-              <div className="bg-blue-50/60 border border-blue-100 rounded p-3 text-xs">
+              <div className="bg-blue-50/60 border border-blue-100 rounded p-2.5 sm:p-3 text-xs">
                 <span className="font-bold text-blue-950 block text-[10px] uppercase tracking-wider">Amount in Words</span>
-                <p className="text-blue-900 font-semibold mt-0.5 capitalize italic">
+                <p className="text-blue-900 font-semibold mt-0.5 capitalize italic text-[11px] leading-snug">
                   {numberToWordsINR(grandTotal)}
                 </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-2 space-y-2.5">
+              <div className="pt-2 space-y-2">
                 <button
                   type="button"
                   onClick={handleSubmitBill}
                   disabled={isSubmitting}
-                  className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded shadow transition-colors text-xs uppercase tracking-wider disabled:opacity-50 cursor-pointer"
+                  className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded shadow transition-colors text-xs uppercase tracking-wider disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? 'Saving Invoice...' : (editId ? 'Update Invoice (Ctrl+Enter)' : 'Save Invoice (Ctrl+Enter)')}
                 </button>
@@ -859,6 +859,24 @@ const OutwardBilling = () => {
           </div>
         </div>
 
+      </div>
+
+      {/* Mobile Floating Sticky Footer Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2.5 shadow-[0_-4px_16px_rgba(0,0,0,0.12)] z-30 flex items-center justify-between gap-3">
+        <div>
+          <span className="text-[10px] uppercase font-bold text-slate-500 block leading-tight">Total</span>
+          <span className="text-base font-black text-blue-900 font-heading">
+            ₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={handleSubmitBill}
+          disabled={isSubmitting}
+          className="bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold py-2.5 px-5 rounded-lg shadow transition-all disabled:opacity-50 cursor-pointer uppercase tracking-wider"
+        >
+          {isSubmitting ? 'Saving...' : (editId ? 'Update Bill' : 'Save Invoice')}
+        </button>
       </div>
 
     </div>

@@ -245,17 +245,17 @@ Thank you for choosing *Vela Agencies Sivakasi*! 🎇
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-[#f8fafc] min-h-screen font-body text-slate-800">
+    <div className="p-2 sm:p-5 lg:p-8 bg-[#f8fafc] min-h-screen font-body text-slate-800 w-full max-w-7xl mx-auto overflow-x-hidden">
       
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700 shadow-sm shrink-0">
               <FiTruck className="text-xl" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold font-heading text-slate-900 tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold font-heading text-slate-900 tracking-tight">
                 Transport Dispatch Reports
               </h1>
               <p className="text-xs text-slate-500">Track shipments, LR receipts, and generate delivery slips</p>
@@ -263,7 +263,7 @@ Thank you for choosing *Vela Agencies Sivakasi*! 🎇
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <button
             onClick={fetchEntries}
             disabled={loading}
@@ -275,7 +275,7 @@ Thank you for choosing *Vela Agencies Sivakasi*! 🎇
 
           <Link
             to="/dashboard/transport/entry"
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs uppercase tracking-wider transition-all shadow cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs uppercase tracking-wider transition-all shadow cursor-pointer whitespace-nowrap"
           >
             <FiPlus className="text-sm" />
             <span>New Transport Entry</span>
@@ -284,12 +284,12 @@ Thank you for choosing *Vela Agencies Sivakasi*! 🎇
       </div>
 
       {/* Main Tabs (Pending vs Finished) */}
-      <div className="flex items-center gap-3 mb-6 border-b border-slate-200">
+      <div className="flex items-center gap-2 sm:gap-3 mb-5 sm:mb-6 border-b border-slate-200 overflow-x-auto w-full scrollbar-none">
         
         {/* Tab 1: Pending */}
         <button
           onClick={() => setActiveTab('pending')}
-          className={`pb-3.5 px-4 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+          className={`pb-3 px-3 sm:px-4 font-bold text-xs sm:text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
             activeTab === 'pending'
               ? 'border-amber-500 text-amber-900'
               : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -297,7 +297,7 @@ Thank you for choosing *Vela Agencies Sivakasi*! 🎇
         >
           <FiClock className={activeTab === 'pending' ? 'text-amber-500' : 'text-slate-400'} />
           <span>Pending Shipments</span>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-black ${
+          <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
             activeTab === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'
           }`}>
             {pendingEntries.length}
@@ -307,7 +307,7 @@ Thank you for choosing *Vela Agencies Sivakasi*! 🎇
         {/* Tab 2: Finished / Reached */}
         <button
           onClick={() => setActiveTab('finished')}
-          className={`pb-3.5 px-4 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+          className={`pb-3 px-3 sm:px-4 font-bold text-xs sm:text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
             activeTab === 'finished'
               ? 'border-emerald-600 text-emerald-950'
               : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -315,7 +315,7 @@ Thank you for choosing *Vela Agencies Sivakasi*! 🎇
         >
           <FiCheckCircle className={activeTab === 'finished' ? 'text-emerald-600' : 'text-slate-400'} />
           <span>Finished / Reached</span>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-black ${
+          <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
             activeTab === 'finished' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
           }`}>
             {finishedEntries.length}
@@ -325,8 +325,8 @@ Thank you for choosing *Vela Agencies Sivakasi*! 🎇
       </div>
 
       {/* Filter & Search Toolbar */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-3 sm:p-4 mb-5 sm:mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3 items-center">
           
           {/* Search Bar */}
           <div className="lg:col-span-4 relative">

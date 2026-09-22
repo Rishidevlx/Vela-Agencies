@@ -312,12 +312,12 @@ const OutwardList = () => {
   const todayRevenue = todayBills.reduce((sum, b) => sum + (parseFloat(b.grand_total) || 0), 0);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-[#f8fafc] min-h-screen font-body text-slate-800">
+    <div className="p-2 sm:p-5 lg:p-8 bg-[#f8fafc] min-h-screen font-body text-slate-800 w-full max-w-7xl mx-auto overflow-x-hidden">
       
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-bold font-heading text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold font-heading text-slate-900 tracking-tight">
             Outward Invoices List
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -325,17 +325,17 @@ const OutwardList = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <button
             onClick={fetchBills}
-            className="flex items-center gap-1.5 px-4 py-2 rounded bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-sm transition-all cursor-pointer"
+            className="flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-sm transition-all cursor-pointer"
           >
             <FiRefreshCw className={isLoading ? 'animate-spin' : ''} /> Refresh
           </button>
 
           <Link
             to="/dashboard/billing/outward"
-            className="flex items-center gap-2 px-5 py-2 rounded bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow transition-all cursor-pointer"
+            className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 sm:px-5 py-2 rounded bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow transition-all cursor-pointer whitespace-nowrap"
           >
             <FiPlus className="text-sm" /> Create New Bill
           </Link>
@@ -343,64 +343,64 @@ const OutwardList = () => {
       </div>
 
       {/* Quick Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
         {/* Total Invoices */}
-        <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Bills</span>
-            <h3 className="text-2xl font-bold text-slate-900 mt-1 font-heading">{bills.length}</h3>
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Bills</span>
+            <h3 className="text-lg sm:text-2xl font-bold text-slate-900 mt-0.5 sm:mt-1 font-heading">{bills.length}</h3>
           </div>
-          <div className="w-10 h-10 rounded bg-blue-50 text-blue-700 flex items-center justify-center text-lg">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded bg-blue-50 text-blue-700 flex items-center justify-center text-sm sm:text-lg">
             <FiFileText />
           </div>
         </div>
 
         {/* Total Billed Revenue */}
-        <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Revenue</span>
-            <h3 className="text-2xl font-bold text-blue-900 mt-1 font-heading">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Revenue</span>
+            <h3 className="text-lg sm:text-2xl font-bold text-blue-900 mt-0.5 sm:mt-1 font-heading">
               ₹{totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
             </h3>
           </div>
-          <div className="w-10 h-10 rounded bg-emerald-50 text-emerald-700 flex items-center justify-center text-lg font-bold">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded bg-emerald-50 text-emerald-700 flex items-center justify-center text-sm sm:text-lg font-bold">
             ₹
           </div>
         </div>
 
         {/* Today's Bills */}
-        <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Today's Bills</span>
-            <h3 className="text-2xl font-bold text-slate-900 mt-1 font-heading">{todayBills.length}</h3>
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider">Today's Bills</span>
+            <h3 className="text-lg sm:text-2xl font-bold text-slate-900 mt-0.5 sm:mt-1 font-heading">{todayBills.length}</h3>
           </div>
-          <div className="w-10 h-10 rounded bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded bg-amber-50 text-amber-600 flex items-center justify-center text-sm sm:text-lg">
             <FiCalendar />
           </div>
         </div>
 
         {/* Today's Revenue */}
-        <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Today's Revenue</span>
-            <h3 className="text-2xl font-bold text-emerald-700 mt-1 font-heading">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider">Today's Revenue</span>
+            <h3 className="text-lg sm:text-2xl font-bold text-emerald-700 mt-0.5 sm:mt-1 font-heading">
               ₹{todayRevenue.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
             </h3>
           </div>
-          <div className="w-10 h-10 rounded bg-emerald-50 text-emerald-700 flex items-center justify-center text-lg font-bold">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded bg-emerald-50 text-emerald-700 flex items-center justify-center text-sm sm:text-lg font-bold">
             ₹
           </div>
         </div>
       </div>
 
       {/* Filters & Actions Bar */}
-      <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 sm:p-4 mb-5 sm:mb-6 flex flex-col md:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
         
         {/* Search Input */}
         <div className="relative flex-1 w-full max-w-md">
           <input
             type="text"
-            placeholder="Search by Invoice #, Customer Name, Phone, City..."
+            placeholder="Search by Invoice #, Customer, Phone, City..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white border border-slate-300 rounded pl-10 pr-4 py-2 text-xs font-medium text-slate-800 outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm"
@@ -409,14 +409,14 @@ const OutwardList = () => {
         </div>
 
         {/* Date Filter & Bulk Actions */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
-          <div className="flex items-center gap-2 bg-white border border-slate-300 rounded px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full md:w-auto justify-between sm:justify-end">
+          <div className="flex items-center gap-2 bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm flex-1 sm:flex-none">
             <FiCalendar className="text-slate-400" />
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-transparent outline-none cursor-pointer text-xs"
+              className="bg-transparent outline-none cursor-pointer text-xs w-full"
             />
             {selectedDate && (
               <button 
@@ -432,9 +432,9 @@ const OutwardList = () => {
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}
-              className="flex items-center gap-1.5 px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors cursor-pointer shadow"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors cursor-pointer shadow"
             >
-              <FiTrash2 /> Delete Selected ({selectedIds.length})
+              <FiTrash2 /> Delete ({selectedIds.length})
             </button>
           )}
         </div>
@@ -443,10 +443,10 @@ const OutwardList = () => {
 
       {/* Main Table */}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="overflow-x-auto w-full scrollbar-thin">
+          <table className="w-full text-left text-xs border-collapse min-w-[700px]">
             <thead>
-              <tr className="bg-slate-100 text-slate-700 uppercase text-[11px] font-bold border-b border-slate-200">
+              <tr className="bg-[#1e40af] text-white uppercase text-[11px] font-bold border-b border-blue-900">
                 <th className="py-3 px-3 w-10 text-center">
                   <input
                     type="checkbox"
@@ -457,7 +457,7 @@ const OutwardList = () => {
                 </th>
                 <th className="py-3 px-3 w-24">Invoice #</th>
                 <th className="py-3 px-3 w-28">Date</th>
-                <th className="py-3 px-4 min-w-[220px]">Customer Details</th>
+                <th className="py-3 px-4 min-w-[200px]">Customer Details</th>
                 <th className="py-3 px-3 w-24 text-center">Items</th>
                 <th className="py-3 px-3 w-32 text-right">Grand Total</th>
                 <th className="py-3 px-4 w-36 text-center">Actions</th>
