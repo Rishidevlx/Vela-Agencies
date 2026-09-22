@@ -4,9 +4,24 @@ import toast from 'react-hot-toast';
 import { 
   FiTruck, FiPlus, FiSearch, FiPrinter, FiEdit2, FiTrash2, 
   FiClock, FiCheckCircle, FiCalendar, FiFilter, FiRefreshCw, 
-  FiAlertCircle, FiX, FiCheck, FiPackage, FiPhone 
+  FiAlertCircle, FiX, FiCheck, FiPackage, FiPhone, FiMapPin 
 } from 'react-icons/fi';
 import TransportSlipModal from '../../components/transport/TransportSlipModal';
+
+// Safe date formatter (eliminates timezone shift)
+const formatDateSafe = (dateStr) => {
+  if (!dateStr) return '-';
+  const clean = dateStr.toString().split('T')[0];
+  const parts = clean.split('-');
+  if (parts.length === 3) {
+    const year = parts[0];
+    const monthIndex = parseInt(parts[1], 10) - 1;
+    const day = parts[2];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${day} ${months[monthIndex]} ${year}`;
+  }
+  return dateStr;
+};
 
 const TransportReport = () => {
   const navigate = useNavigate();
@@ -89,8 +104,8 @@ const TransportReport = () => {
         (item.lr_no && item.lr_no.toLowerCase().includes(q))
       );
 
-      // 2. Date Filtering
-      const bookingDateStr = item.booking_date ? item.booking_date.split('T')[0] : '';
+      // 2. Pure String Date Filtering (YYYY-MM-DD)
+      const bookingDateStr = item.booking_date ? item.booking_date.toString().split('T')[0] : '';
       const matchFrom = !fromDate || (bookingDateStr >= fromDate);
       const matchTo = !toDate || (bookingDateStr <= toDate);
 
@@ -268,33 +283,33 @@ const TransportReport = () => {
             />
           </div>
 
-          {/* From Date */}
-          <div className="lg:col-span-2">
+          {/* Date Range: From Date */}
+          <div className="lg:col-span-2 relative">
+            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">From Date</label>
             <input
               type="date"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-600"
-              title="From Booking Date"
+              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-600 font-medium text-slate-700"
             />
           </div>
 
-          {/* To Date */}
-          <div className="lg:col-span-2">
+          {/* Date Range: To Date */}
+          <div className="lg:col-span-2 relative">
+            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">To Date</label>
             <input
               type="date"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-600"
-              title="To Booking Date"
+              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-600 font-medium text-slate-700"
             />
           </div>
 
           {/* Quick Date Buttons */}
-          <div className="lg:col-span-2 flex items-center gap-1.5">
+          <div className="lg:col-span-2 flex items-end gap-1.5 pt-3 sm:pt-0">
             <button
               onClick={setTodayFilter}
-              className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors cursor-pointer shrink-0"
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors cursor-pointer shrink-0"
             >
               Today
             </button>
@@ -309,7 +324,7 @@ const TransportReport = () => {
           </div>
 
           {/* Records per page selector */}
-          <div className="lg:col-span-2 flex items-center justify-end gap-2 text-xs text-slate-500">
+          <div className="lg:col-span-2 flex items-center justify-end gap-2 text-xs text-slate-500 pt-3 sm:pt-0">
             <span>Show:</span>
             <select
               value={itemsPerPage}
@@ -364,9 +379,7 @@ const TransportReport = () => {
               ) : (
                 paginatedEntries.map((item, idx) => {
                   const itemIndex = (currentPage - 1) * itemsPerPage + idx + 1;
-                  const dateFormatted = item.booking_date 
-                    ? new Date(item.booking_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) 
-                    : '-';
+                  const dateFormatted = formatDateSafe(item.booking_date);
 
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
@@ -453,7 +466,7 @@ const TransportReport = () => {
                       <td className="py-3 px-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           
-                          {/* Print Slip Button (Highlighted in Finished tab) */}
+                          {/* Print Slip Button */}
                           <button
                             onClick={() => setSelectedSlipEntry(item)}
                             className="p-1.5 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors cursor-pointer border border-blue-200"

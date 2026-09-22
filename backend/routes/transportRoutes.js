@@ -27,6 +27,7 @@ const ensureTransportTable = async (connection) => {
 };
 
 // @desc    Get all transport entries
+// @desc    Get all transport entries
 // @route   GET /api/transport
 // @access  Private (Admin)
 router.get('/', protect, async (req, res) => {
@@ -35,7 +36,14 @@ router.get('/', protect, async (req, res) => {
     await ensureTransportTable(connection);
 
     const { status, search, from_date, to_date } = req.query;
-    let query = 'SELECT * FROM transport_entries WHERE 1=1';
+    let query = `
+      SELECT id, invoice_no, transport_name, transport_city, customer_name, 
+             customer_phone, customer_address, lr_no, parcels, 
+             DATE_FORMAT(booking_date, '%Y-%m-%d') as booking_date, 
+             status, remarks, created_at, updated_at 
+      FROM transport_entries 
+      WHERE 1=1
+    `;
     const params = [];
 
     if (status) {
@@ -88,7 +96,7 @@ router.get('/lookup/:invoiceNo', protect, async (req, res) => {
 
     // Try finding in outward_bills by bill_no, numeric bill_no, id, or like
     const [bills] = await connection.query(
-      `SELECT bill_no, bill_date, customer_name, phone_number, address, city, grand_total, total_items 
+      `SELECT bill_no, DATE_FORMAT(bill_date, '%Y-%m-%d') as bill_date, customer_name, phone_number, address, city, grand_total, total_items 
        FROM outward_bills 
        WHERE bill_no = ? OR (bill_no = ? AND ? IS NOT NULL) OR (id = ? AND ? IS NOT NULL) OR bill_no LIKE ? 
        ORDER BY id DESC LIMIT 1`,
@@ -107,7 +115,7 @@ router.get('/lookup/:invoiceNo', protect, async (req, res) => {
           customer_phone: bill.phone_number || '',
           customer_address: bill.address || '',
           transport_city: bill.city || '',
-          booking_date: bill.bill_date ? new Date(bill.bill_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          booking_date: bill.bill_date || new Date().toISOString().split('T')[0],
           parcels: 1
         }
       });
@@ -127,7 +135,14 @@ router.get('/:id', protect, async (req, res) => {
   try {
     const connection = await pool.getConnection();
     await ensureTransportTable(connection);
-    const [rows] = await connection.query('SELECT * FROM transport_entries WHERE id = ?', [req.params.id]);
+    const [rows] = await connection.query(
+      `SELECT id, invoice_no, transport_name, transport_city, customer_name, 
+              customer_phone, customer_address, lr_no, parcels, 
+              DATE_FORMAT(booking_date, '%Y-%m-%d') as booking_date, 
+              status, remarks, created_at, updated_at 
+       FROM transport_entries WHERE id = ?`, 
+      [req.params.id]
+    );
     connection.release();
 
     if (rows.length === 0) {
@@ -177,7 +192,9 @@ router.post('/', protect, async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const formattedDate = booking_date ? new Date(booking_date) : new Date();
+    const formattedDate = booking_date 
+      ? booking_date.toString().split('T')[0] 
+      : new Date().toISOString().split('T')[0];
 
     const [result] = await connection.query(insertQuery, [
       invoice_no || '',
@@ -198,7 +215,7 @@ router.post('/', protect, async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Transport entry created successfully',
-      data: { id: result.insertId, ...req.body }
+      data: { id: result.insertId, ...req.body, booking_date: formattedDate }
     });
   } catch (error) {
     console.error('Error creating transport entry:', error);
@@ -244,7 +261,9 @@ router.put('/:id', protect, async (req, res) => {
       WHERE id = ?
     `;
 
-    const formattedDate = booking_date ? new Date(booking_date) : new Date();
+    const formattedDate = booking_date 
+      ? booking_date.toString().split('T')[0] 
+      : new Date().toISOString().split('T')[0];
 
     const [result] = await connection.query(updateQuery, [
       invoice_no || '',
