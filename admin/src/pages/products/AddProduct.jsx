@@ -195,22 +195,22 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex items-center gap-4 mb-6">
+    <div className="p-3 sm:p-6 max-w-6xl mx-auto font-body">
+      <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
         <button 
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors shrink-0"
         >
           <FiArrowLeft className="text-xl text-gray-600" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">{isEditMode ? 'Edit Product' : 'Add New Product'}</h1>
-          <p className="text-gray-500 text-sm mt-1">{isEditMode ? 'Update product details and pricing.' : 'Fill in the information below to add a new product.'}</p>
+          <h1 className="text-xl sm:text-2xl font-bold font-heading text-gray-800">{isEditMode ? 'Edit Product' : 'Add New Product'}</h1>
+          <p className="text-gray-500 text-xs sm:text-sm mt-0.5">{isEditMode ? 'Update product details and pricing.' : 'Fill in the information below to add a new product.'}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column */}
@@ -416,23 +416,23 @@ const AddProduct = () => {
             </div>
           </div>
 
-          <div className="border-t border-gray-100 pt-6 flex gap-4">
+          <div className="border-t border-gray-100 pt-6 flex items-center justify-end gap-3">
             <button 
               type="button" 
               onClick={() => navigate('/dashboard/products')}
-              className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button 
               type="submit"
               disabled={isLoading}
-              className="flex-1 bg-[#3c50e0] text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 font-medium transition-colors disabled:opacity-50"
+              className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
-                <><FiSave /> {isEditMode ? 'Update Product' : 'Save Product'}</>
+                <><FiSave className="text-xs" /> {isEditMode ? 'Update Product' : 'Save Product'}</>
               )}
             </button>
           </div>

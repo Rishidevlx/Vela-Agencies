@@ -103,19 +103,19 @@ const HomeCMS = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto pb-10">
+    <div className="max-w-4xl mx-auto pb-10 p-3 sm:p-6 font-body">
       
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Home Page CMS</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage content displayed on the main landing page.</p>
+          <h1 className="text-xl sm:text-2xl font-bold font-heading text-gray-800">Home Page CMS</h1>
+          <p className="text-gray-500 text-xs sm:text-sm mt-0.5">Manage content displayed on the main landing page.</p>
         </div>
         <button 
           onClick={handleSaveChanges}
           disabled={isLoading || isUploading}
-          className="flex items-center gap-2 bg-[#3c50e0] hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2.5 rounded-md font-medium transition-colors shadow-sm"
+          className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
         >
-          <FiSave />
+          <FiSave className="text-xs" />
           {isLoading ? 'Saving...' : 'Save Changes'}
         </button>
       </div>

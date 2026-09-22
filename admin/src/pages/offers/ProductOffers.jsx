@@ -148,23 +148,23 @@ const ProductOffers = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-3 sm:p-6 max-w-7xl mx-auto font-body">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Product Offers</h1>
-          <p className="text-sm text-gray-500">Manage discounts and offer durations</p>
+          <h1 className="text-xl sm:text-2xl font-bold font-heading text-gray-800">Product Offers</h1>
+          <p className="text-xs sm:text-sm text-gray-500">Manage discounts and offer durations</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 w-full sm:w-auto">
           <button 
             onClick={handleBulkSave}
             disabled={Object.keys(editedProducts).length === 0 || isSaving}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-sm ${
               Object.keys(editedProducts).length > 0 
-                ? 'bg-[#3c50e0] text-white hover:bg-blue-700 shadow-md' 
+                ? 'bg-blue-700 text-white hover:bg-blue-800 cursor-pointer' 
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             }`}
           >
-            <FiSave />
+            <FiSave className="text-xs" />
             {isSaving ? 'Saving...' : `Save ${Object.keys(editedProducts).length > 0 ? `(${Object.keys(editedProducts).length})` : 'Changes'}`}
           </button>
         </div>

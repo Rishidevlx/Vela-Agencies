@@ -440,21 +440,22 @@ const TransportEntry = () => {
           </div>
         </div>
 
-        {/* Bottom Form Actions */}
-        <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        {/* Bottom Form Actions - Compact & Responsive */}
+        <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={handleReset}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            className="px-3 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-semibold text-xs tracking-wider transition-colors flex items-center justify-center gap-1 cursor-pointer shrink-0"
           >
             <FiRotateCcw className="text-xs" />
-            <span>Reset Form</span>
+            <span className="hidden sm:inline">Reset Form</span>
+            <span className="sm:hidden">Reset</span>
           </button>
 
-          <div className="w-full sm:w-auto flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link
               to="/dashboard/transport/report"
-              className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs uppercase tracking-wider text-center transition-colors"
+              className="px-3 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-semibold text-xs text-center transition-colors shrink-0"
             >
               Cancel
             </Link>
@@ -462,10 +463,10 @@ const TransportEntry = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-8 py-2.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 whitespace-nowrap"
             >
-              <FiSave className="text-sm" />
-              <span>{loading ? 'Saving...' : (editId ? 'Update Entry' : 'Save Transport Entry')}</span>
+              <FiSave className="text-xs" />
+              <span>{loading ? 'Saving...' : (editId ? 'Update Entry' : 'Save Entry')}</span>
             </button>
           </div>
         </div>

@@ -79,20 +79,20 @@ const SortableCategoryItem = ({ category, onEdit, onDelete, parentName }) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         <button 
           onClick={() => onEdit(category)}
-          className="p-2 text-gray-500 hover:text-[#3c50e0] hover:bg-blue-50 rounded transition-colors"
+          className="p-1.5 text-gray-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
           title="Edit Category"
         >
-          <FiEdit2 />
+          <FiEdit2 className="text-sm" />
         </button>
         <button 
           onClick={() => onDelete(category.id)}
-          className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+          className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
           title="Delete Category"
         >
-          <FiTrash2 />
+          <FiTrash2 className="text-sm" />
         </button>
       </div>
     </div>
@@ -402,20 +402,20 @@ const Categories = () => {
                 </select>
               </div>
 
-              <div className="pt-4 flex gap-3">
+              <div className="pt-4 flex items-center gap-2">
                 <button 
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 bg-[#3c50e0] hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors flex justify-center items-center gap-2 disabled:opacity-70"
+                  className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs uppercase tracking-wider py-2 px-4 rounded-lg transition-colors flex justify-center items-center gap-1.5 shadow-sm disabled:opacity-70 cursor-pointer"
                 >
-                  {isLoading ? 'Saving...' : editingId ? <><FiCheck /> Update</> : <><FiPlus /> Create</>}
+                  {isLoading ? 'Saving...' : editingId ? <><FiCheck className="text-xs" /> Update</> : <><FiPlus className="text-xs" /> Create</>}
                 </button>
                 
                 {editingId && (
                   <button 
                     type="button"
                     onClick={resetForm}
-                    className="px-4 py-2 border border-gray-300 text-gray-600 hover:bg-gray-50 font-medium rounded-lg transition-colors"
+                    className="px-3 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>

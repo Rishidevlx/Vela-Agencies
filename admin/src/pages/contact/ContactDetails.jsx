@@ -291,9 +291,9 @@ const ContactDetails = () => {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 bg-brand text-white px-8 py-3 rounded-xl font-bold hover:bg-brand/90 transition-all shadow-md disabled:opacity-50"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-blue-800 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
           >
-            <FiSave className="text-lg" />
+            <FiSave className="text-xs" />
             {loading ? 'Saving...' : 'Save Settings'}
           </button>
         </div>

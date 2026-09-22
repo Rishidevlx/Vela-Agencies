@@ -267,89 +267,85 @@ const WhatsAppEnquiries = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+    <div className="p-2 sm:p-5 lg:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
+      <div className="mb-5 sm:mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">WhatsApp Enquiries</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage all pre-checkout mobile numbers and cart data</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">WhatsApp Enquiries</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">Manage all pre-checkout mobile numbers and cart data</p>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
+        <div className="flex flex-wrap gap-3 sm:gap-4 items-stretch sm:items-center">
           {/* Feature Toggle */}
-          <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-lg border border-gray-200 shadow-sm">
-            <span className="text-sm font-semibold text-gray-700">Collect Numbers</span>
+          <div className="flex items-center gap-3 bg-white px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-lg border border-gray-200 shadow-sm">
+            <span className="text-xs sm:text-sm font-semibold text-gray-700">Collect Numbers</span>
             <button 
               onClick={handleToggleFeature}
               disabled={isUpdatingToggle}
-              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none ${
+              className={`relative inline-flex h-6 sm:h-7 w-11 sm:w-12 items-center rounded-full transition-colors focus:outline-none ${
                 isFeatureActive ? 'bg-green-500' : 'bg-gray-300'
               } ${isUpdatingToggle ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <span className="sr-only">Toggle mobile number collection</span>
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm ${
+                className={`inline-block h-4 sm:h-5 w-4 sm:w-5 transform rounded-full bg-white transition-transform shadow-sm ${
                   isFeatureActive ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
             </button>
-            <span className={`text-xs font-bold px-2 py-1 rounded-md ${isFeatureActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+            <span className={`text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-md ${isFeatureActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
               {isFeatureActive ? 'ACTIVE' : 'INACTIVE'}
             </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
+          <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-4 items-center flex-1 sm:flex-none">
             <input 
               type="date" 
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg outline-none focus:border-brand text-sm text-gray-600"
+              className="px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg outline-none focus:border-brand text-xs sm:text-sm text-gray-600 flex-1 sm:flex-none"
               title="From Date"
             />
-            <span className="text-gray-400">to</span>
+            <span className="text-gray-400 text-xs">to</span>
             <input 
               type="date" 
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg outline-none focus:border-brand text-sm text-gray-600"
+              className="px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg outline-none focus:border-brand text-xs sm:text-sm text-gray-600 flex-1 sm:flex-none"
               title="To Date"
             />
           </div>
 
           {/* Search */}
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input 
               type="text" 
-              placeholder="Search by Mobile No..." 
+              placeholder="Search mobile / name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-brand w-full sm:w-64"
+              className="pl-9 pr-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg outline-none focus:border-brand text-xs sm:text-sm w-full sm:w-56"
             />
           </div>
         </div>
       </div>
 
-      {/* Bulk Action Bar */}
+      {/* Bulk Delete Bar */}
       {selectedIds.length > 0 && (
-        <div className="bg-brand text-white px-6 py-3 rounded-lg shadow-md mb-6 flex flex-col sm:flex-row justify-between items-center animate-fade-in-up">
-          <div className="flex items-center gap-2 mb-3 sm:mb-0">
-            <FiCheckSquare className="text-xl" />
-            <span className="font-bold">{selectedIds.length} items selected</span>
+        <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex justify-between items-center text-blue-900 animate-fade-in">
+          <div className="flex items-center gap-2 font-semibold text-sm">
+            <FiCheckSquare className="text-blue-600 text-lg" />
+            <span>{selectedIds.length} item(s) selected</span>
           </div>
           <div className="flex items-center gap-3">
-            <select 
-              onChange={(e) => handleBulkStatus(e.target.value)}
-              className="bg-white text-gray-800 text-sm font-semibold rounded-md px-3 py-1.5 outline-none cursor-pointer"
-              defaultValue=""
+            <button 
+              onClick={() => setSelectedIds([])}
+              className="text-xs text-gray-500 hover:text-gray-700 font-semibold"
             >
-              <option value="" disabled>Change Status</option>
-              <option value="New">New</option>
-              <option value="Connected">Connected</option>
-              <option value="Enquiry Success">Enquiry Success</option>
-            </select>
+              Deselect All
+            </button>
             <button 
               onClick={handleBulkDelete}
-              className="bg-red-500 hover:bg-red-600 px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2 transition-colors"
+              className="bg-red-500 hover:bg-red-600 text-white px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <FiTrash2 /> Delete
             </button>
@@ -363,7 +359,8 @@ const WhatsAppEnquiries = () => {
         ) : filteredEnquiries.length === 0 ? (
           <div className="p-10 text-center text-gray-500">No enquiries found.</div>
         ) : (
-          <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto w-full scrollbar-thin">
+            <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200 text-sm text-gray-600">
                 <th className="py-4 px-6 font-semibold w-10">
@@ -464,6 +461,7 @@ const WhatsAppEnquiries = () => {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 

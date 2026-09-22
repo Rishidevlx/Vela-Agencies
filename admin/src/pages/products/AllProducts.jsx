@@ -564,8 +564,8 @@ const AllProducts = () => {
         )}
 
         {/* Data Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto w-full scrollbar-thin">
+          <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
               <tr className="bg-white border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-semibold">
                 <th className="p-4 w-12 text-center">

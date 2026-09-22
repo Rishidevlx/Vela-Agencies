@@ -276,12 +276,12 @@ const GeneralSettings = () => {
           <button 
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 bg-brand text-white px-8 py-3.5 rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg hover:shadow-brand/30 disabled:opacity-70"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-blue-800 transition-all shadow-sm disabled:opacity-70 cursor-pointer"
           >
             {saving ? (
               <>Saving...</>
             ) : (
-              <><FiSave className="text-xl" /> Save Configuration</>
+              <><FiSave className="text-xs" /> Save Configuration</>
             )}
           </button>
         </div>

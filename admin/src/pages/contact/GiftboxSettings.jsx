@@ -168,11 +168,11 @@ const GiftboxSettings = () => {
             ></textarea>
           </div>
 
-          <div className="pt-4 border-t border-gray-100">
+          <div className="pt-4 border-t border-gray-100 flex justify-end">
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50"
+              className="w-full sm:w-auto bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-blue-800 transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
             >
               {loading ? 'Saving...' : 'Save Settings'}
             </button>
