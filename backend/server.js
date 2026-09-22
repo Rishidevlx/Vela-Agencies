@@ -23,6 +23,7 @@ const productRoutes = require('./routes/productRoutes');
 const enquiryRoutes = require('./routes/enquiryRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const billingRoutes = require('./routes/billingRoutes');
+const transportRoutes = require('./routes/transportRoutes');
 
 app.use('/api/upload', uploadRoutes);
 app.use('/api/cms/home', cmsRoutes);
@@ -31,6 +32,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/transport', transportRoutes);
 
 app.get('/', (req, res) => {
   res.send('AK Crackers Admin API is running!');

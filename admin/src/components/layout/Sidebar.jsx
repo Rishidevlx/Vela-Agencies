@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { 
   FiHome, FiBox, FiTag, FiPhone, FiMessageCircle, 
-  FiSettings, FiUser, FiChevronDown, FiChevronRight, FiLogOut, FiX, FiMonitor, FiFileText
+  FiSettings, FiUser, FiChevronDown, FiChevronRight, FiLogOut, FiX, FiMonitor, FiFileText, FiTruck
 } from 'react-icons/fi';
 import whiteLogo from '../../assets/logo-white-withoutbg.png';
 
@@ -141,6 +141,11 @@ const Sidebar = ({ onClose }) => {
     { title: 'Outward List', to: '/dashboard/billing/list', onClick: onClose },
   ];
 
+  const transportItems = [
+    { title: 'Transport Entry', to: '/dashboard/transport/entry', onClick: onClose },
+    { title: 'Transport Report', to: '/dashboard/transport/report', onClick: onClose },
+  ];
+
   const adminItems = [
     { title: 'Profile', to: '/dashboard/account/profile', onClick: onClose },
     { title: 'Change Password', to: '/dashboard/account/change-password', onClick: onClose },
@@ -187,6 +192,14 @@ const Sidebar = ({ onClose }) => {
           isOpen={openMenus['Billing'] !== undefined ? openMenus['Billing'] : true}
           onClick={() => toggleMenu('Billing')}
           children={billingItems}
+        />
+
+        <SidebarItem 
+          icon={FiTruck} 
+          title="Transport" 
+          isOpen={openMenus['Transport'] !== undefined ? openMenus['Transport'] : true}
+          onClick={() => toggleMenu('Transport')}
+          children={transportItems}
         />
 
         {/* Admin Section */}

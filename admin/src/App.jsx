@@ -24,6 +24,9 @@ import ChangePassword from './pages/account/ChangePassword';
 import OutwardBilling from './pages/billing/OutwardBilling';
 import OutwardList from './pages/billing/OutwardList';
 
+import TransportEntry from './pages/transport/TransportEntry';
+import TransportReport from './pages/transport/TransportReport';
+
 function App() {
   return (
     <Router>
@@ -44,6 +47,8 @@ function App() {
           <Route path="offers" element={<ProductOffers />} />
           <Route path="billing/outward" element={<OutwardBilling />} />
           <Route path="billing/list" element={<OutwardList />} />
+          <Route path="transport/entry" element={<TransportEntry />} />
+          <Route path="transport/report" element={<TransportReport />} />
           <Route path="settings/whatsapp" element={<WhatsAppSettings />} />
           <Route path="settings/general" element={<GeneralSettings />} />
           <Route path="settings/seo" element={<SEOSettings />} />
