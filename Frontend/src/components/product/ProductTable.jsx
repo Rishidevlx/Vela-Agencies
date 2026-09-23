@@ -4,18 +4,36 @@ import { FiMinus, FiPlus, FiX } from 'react-icons/fi';
 import confetti from 'canvas-confetti';
 import toast from 'react-hot-toast';
 
-const ProductTable = ({ products }) => {
+const ProductTable = ({ products, categoriesList = [] }) => {
   const { addToCart } = useCart();
   
-  // Group products by category
-  const groupedProducts = products.reduce((acc, product) => {
-    const category = product.category || 'Uncategorized';
-    if (!acc[category]) {
-      acc[category] = [];
+  // Group products by category respecting categoriesList order
+  const groupedProducts = React.useMemo(() => {
+    const map = {};
+    const uncategorized = [];
+
+    // Initialize with categoriesList to preserve sorting
+    if (categoriesList && categoriesList.length > 0) {
+      categoriesList.forEach(cat => {
+        map[cat.name] = [];
+      });
     }
-    acc[category].push(product);
-    return acc;
-  }, {});
+
+    products.forEach(p => {
+      const cat = p.category || 'General Crackers';
+      if (!map[cat]) map[cat] = [];
+      map[cat].push(p);
+    });
+
+    // Remove empty categories
+    const cleaned = {};
+    Object.entries(map).forEach(([cat, items]) => {
+      if (items.length > 0) {
+        cleaned[cat] = items;
+      }
+    });
+    return cleaned;
+  }, [products, categoriesList]);
 
   // Local state for tracking quantities before adding to cart
   const [quantities, setQuantities] = useState({});

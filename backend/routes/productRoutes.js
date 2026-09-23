@@ -284,18 +284,21 @@ router.get('/pricelist/download', async (req, res) => {
       });
     };
 
-    // 2. Fetch all active products
+    // 2. Fetch all active products ordered by category sort_order, category name, product name
     const [products] = await db.query(`
-      SELECT p.*, c.name as category_name 
+      SELECT p.*, c.name as category_name, c.sort_order as cat_order
       FROM products p 
       LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.status = 'active'
-      ORDER BY c.name ASC, p.name ASC
+      ORDER BY COALESCE(c.sort_order, 999) ASC, COALESCE(c.name, 'zzz') ASC, p.id ASC
     `);
 
-    // Fetch logo and banner
+    // Fetch logo, banner, and contact info from CMS
     let logoBuffer = null;
     let bannerBuffer = null;
+    let contactPhone = '+91 73053 27400';
+    let shopAddress = 'Sivakasi, Tamil Nadu, India';
+
     try {
       const [cmsRows] = await db.query(`SELECT cms_key, cms_value FROM home_cms`);
       const cmsData = {};
@@ -314,7 +317,12 @@ router.get('/pricelist/download', async (req, res) => {
       
       const banners = cmsData.hero_banners;
       if (banners && banners.length > 0) {
-         bannerBuffer = await fetchImageBufferSafe(banners[0].replace('f_auto', 'f_jpg').replace('.webp', '.jpg'));
+        bannerBuffer = await fetchImageBufferSafe(banners[0].replace('f_auto', 'f_jpg').replace('.webp', '.jpg'));
+      }
+
+      if (cmsData.contact_details) {
+        contactPhone = cmsData.contact_details.phone1 || cmsData.contact_details.phone || contactPhone;
+        shopAddress = cmsData.contact_details.address || shopAddress;
       }
     } catch (err) {
       console.error('Error fetching CMS images:', err);
@@ -325,119 +333,169 @@ router.get('/pricelist/download', async (req, res) => {
     const buffers = [];
     doc.on('data', buffers.push.bind(buffers));
 
-    // Draw Top Banner & Logo
-    if (logoBuffer) {
-       try {
-         doc.image(logoBuffer, { fit: [100, 100], align: 'center' });
-         doc.moveDown(1);
-       } catch (e) {
-         console.error('Error drawing logo:', e);
-         logoBuffer = null; // disable watermark if format is bad
-       }
-    }
-    
-    doc.fontSize(24).font('Helvetica-Bold').fillColor('#EAB308').text('VELA AGENCIES', { align: 'center' });
-    doc.fontSize(14).font('Helvetica-Bold').fillColor('#000000').text('OFFICIAL PRICELIST', { align: 'center' });
-    doc.moveDown(2);
+    const contentWidth = doc.page.width - 60; // 535.28 pt
 
+    // 1. Draw Banner Image AT TOP (Moved to the very top as requested)
     if (bannerBuffer) {
-       try {
-         doc.image(bannerBuffer, { width: doc.page.width - 60, align: 'center' });
-         doc.moveDown(3);
-       } catch (e) {
-         console.error('Error drawing banner:', e);
-       }
+      try {
+        doc.image(bannerBuffer, 30, 25, { width: contentWidth });
+        doc.moveDown(0.5);
+      } catch (e) {
+        console.error('Error drawing banner:', e);
+      }
+    } else if (logoBuffer) {
+      try {
+        doc.image(logoBuffer, (doc.page.width - 90) / 2, 25, { width: 90 });
+        doc.moveDown(0.5);
+      } catch (e) {
+        console.error('Error drawing logo:', e);
+      }
     }
 
-    // Group products by category
+    // 2. Draw "VELA AGENCIES OFFICIAL PRICELIST" BELOW Banner
+    doc.moveDown(0.8);
+    doc.fontSize(22).font('Helvetica-Bold').fillColor('#B45309').text('VELA AGENCIES', { align: 'center' });
+    doc.fontSize(12).font('Helvetica-Bold').fillColor('#1E293B').text('OFFICIAL FESTIVE PRICELIST', { align: 'center' });
+    doc.fontSize(8.5).font('Helvetica').fillColor('#64748B').text(`${shopAddress} | Phone/WhatsApp: ${contactPhone} | ${frontendUrl.replace(/^https?:\/\//, '')}`, { align: 'center' });
+    
+    // Decorative Accent Line
+    doc.moveDown(0.5);
+    const lineY = doc.y;
+    doc.lineWidth(1.5).strokeColor('#F59E0B').moveTo(30, lineY).lineTo(doc.page.width - 30, lineY).stroke();
+    doc.moveDown(0.8);
+
+    // Check if any product has an original price
+    const hasAnyOriginalPrice = products.some(p => p.original_price && parseFloat(p.original_price) > 0);
+
+    // Group products by category maintaining order
     const categories = {};
     products.forEach(p => {
-       const cat = p.category_name || 'Uncategorized';
-       if (!categories[cat]) categories[cat] = [];
-       categories[cat].push(p);
+      const cat = p.category_name || 'General Crackers';
+      if (!categories[cat]) categories[cat] = [];
+      categories[cat].push(p);
     });
 
     let globalSno = 1;
 
     for (const [categoryName, catProducts] of Object.entries(categories)) {
-       doc.moveDown(1);
-       doc.font('Helvetica-Bold').fontSize(14).fillColor('#000000').text(categoryName);
-       doc.moveDown(0.5);
+      // Check page break for category header
+      if (doc.y > doc.page.height - 120) {
+        doc.addPage();
+      }
 
-       const tableData = catProducts.map((p) => {
-          const orig = p.original_price ? parseFloat(p.original_price) : 0;
-          const curr = parseFloat(p.price);
+      // Attractive Category Header Banner Bar
+      const catHeaderY = doc.y;
+      doc.rect(30, catHeaderY, contentWidth, 22).fill('#1E3A8A'); // Royal Blue Bar
+      doc.font('Helvetica-Bold').fontSize(11).fillColor('#FFFFFF').text(`  ${categoryName.toUpperCase()} (${catProducts.length} ITEMS)`, 35, catHeaderY + 6);
+      doc.y = catHeaderY + 26;
+
+      const tableData = catProducts.map((p) => {
+        const orig = p.original_price ? parseFloat(p.original_price) : 0;
+        const curr = parseFloat(p.price);
+        
+        let parsedUnit = 'packet';
+        if (p.unit) {
+          try {
+            const u = typeof p.unit === 'string' ? JSON.parse(p.unit) : p.unit;
+            if (Array.isArray(u) && u.length > 0) parsedUnit = u[0];
+            else if (typeof u === 'string') parsedUnit = u;
+          } catch (e) {
+            parsedUnit = p.unit;
+          }
+        }
+
+        if (hasAnyOriginalPrice) {
+          return [
+            (globalSno++).toString(),
+            p.name,
+            parsedUnit,
+            orig > 0 ? `Rs. ${orig.toFixed(2)}` : '-',
+            `Rs. ${curr.toFixed(2)}`
+          ];
+        } else {
+          // Remove Original Price column completely if no original price exists
+          return [
+            (globalSno++).toString(),
+            p.name,
+            parsedUnit,
+            `Rs. ${curr.toFixed(2)}`
+          ];
+        }
+      });
+
+      const tableHeaders = hasAnyOriginalPrice ? [
+        { label: 'S.No', width: 35, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
+        { label: 'Product Name', width: 255, headerColor: '#FACC15', headerOpacity: 1, align: 'left' },
+        { label: 'Unit', width: 65, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
+        { label: 'Original Price', width: 90, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
+        { label: 'Discount Price', width: 90, headerColor: '#FACC15', headerOpacity: 1, align: 'center' }
+      ] : [
+        { label: 'S.No', width: 45, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
+        { label: 'Product Name', width: 335, headerColor: '#FACC15', headerOpacity: 1, align: 'left' },
+        { label: 'Unit', width: 75, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
+        { label: 'Rate / Price', width: 80, headerColor: '#FACC15', headerOpacity: 1, align: 'center' }
+      ];
+
+      const table = {
+        headers: tableHeaders,
+        rows: tableData
+      };
+
+      await doc.table(table, {
+        prepareHeader: () => doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#0F172A'),
+        prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+          doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#1E293B');
           
-          let parsedUnit = 'packet';
-          if (p.unit) {
-            try {
-              const u = JSON.parse(p.unit);
-              if (Array.isArray(u) && u.length > 0) parsedUnit = u[0];
-              else if (typeof u === 'string') parsedUnit = u;
-            } catch (e) {
-              parsedUnit = p.unit;
+          // Product Name click-through link
+          if (indexColumn === 1) {
+            const prod = catProducts[indexRow];
+            if (prod) {
+              const slugify = (text) => text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+              const productLink = `${frontendUrl}/product/${slugify(prod.name)}`;
+              doc.link(rectCell.x, rectCell.y, rectCell.width, rectCell.height, productLink);
+              doc.fillColor('#1D4ED8'); // Clean Blue link color
             }
           }
+          
+          // Crisp, professional cell borders
+          doc.lineWidth(0.5).strokeColor('#94A3B8');
+          // Vertical right border
+          doc.moveTo(rectCell.x + rectCell.width, rectCell.y).lineTo(rectCell.x + rectCell.width, rectCell.y + rectCell.height).stroke();
+          // Vertical left border on first column
+          if (indexColumn === 0) {
+            doc.moveTo(rectCell.x, rectCell.y).lineTo(rectCell.x, rectCell.y + rectCell.height).stroke();
+          }
+          // Horizontal bottom border
+          doc.moveTo(rectCell.x, rectCell.y + rectCell.height).lineTo(rectCell.x + rectCell.width, rectCell.y + rectCell.height).stroke();
+        },
+        padding: 4
+      });
 
-          return [
-             (globalSno++).toString(),
-             p.name,
-             parsedUnit,
-             orig > 0 ? `Rs. ${orig.toFixed(2)}` : '-',
-             `Rs. ${curr.toFixed(2)}`
-          ];
-       });
-
-       const table = {
-         headers: [
-           { label: 'S.No', width: 40, headerColor: '#FFF533', headerOpacity: 1 },
-           { label: 'Product Name', width: 230, headerColor: '#FFF533', headerOpacity: 1 },
-           { label: 'Unit', width: 70, headerColor: '#FFF533', headerOpacity: 1 },
-           { label: 'Original Price', width: 95, headerColor: '#FFF533', headerOpacity: 1 },
-           { label: 'Discount Price', width: 95, headerColor: '#FFF533', headerOpacity: 1 }
-         ],
-         rows: tableData
-       };
-
-       await doc.table(table, {
-         prepareHeader: () => doc.font('Helvetica-Bold').fontSize(10).fillColor('#000000'),
-         prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
-           doc.font('Helvetica-Bold').fontSize(9).fillColor('#000000');
-           
-           if (indexColumn === 1) {
-             const prod = catProducts[indexRow];
-              if (prod) {
-                const slugify = (text) => text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
-                const productLink = `${frontendUrl}/product/${slugify(prod.name)}`;
-                doc.link(rectCell.x, rectCell.y, rectCell.width, rectCell.height, productLink);
-                // Add a subtle color to indicate it's a link
-               doc.fillColor('#0066cc'); 
-             }
-           }
-           
-           // Draw vertical borders
-           doc.lineWidth(0.5).strokeColor('#dddddd');
-           doc.moveTo(rectCell.x + rectCell.width, rectCell.y).lineTo(rectCell.x + rectCell.width, rectCell.y + rectCell.height).stroke();
-           if (indexColumn === 0) {
-              doc.moveTo(rectCell.x, rectCell.y).lineTo(rectCell.x, rectCell.y + rectCell.height).stroke();
-           }
-         },
-         padding: 5
-       });
+      doc.moveDown(0.5);
     }
 
-    // Add watermark to all pages
+    // Add watermark & footer page numbering to all pages
     const pages = doc.bufferedPageRange();
     for (let i = 0; i < pages.count; i++) {
       doc.switchToPage(i);
+      
+      // Background Watermark
       if (logoBuffer) {
         doc.save();
-        doc.opacity(0.1);
+        doc.opacity(0.06);
         try {
-          doc.image(logoBuffer, (doc.page.width - 300) / 2, (doc.page.height - 300) / 2, { width: 300 });
+          doc.image(logoBuffer, (doc.page.width - 260) / 2, (doc.page.height - 260) / 2, { width: 260 });
         } catch (e) {}
         doc.restore();
       }
+
+      // Bottom Footer Bar
+      const footerY = doc.page.height - 22;
+      doc.lineWidth(0.5).strokeColor('#CBD5E1').moveTo(30, footerY - 5).lineTo(doc.page.width - 30, footerY - 5).stroke();
+      doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#64748B')
+         .text('Vela Agencies, Sivakasi  |  100% Genuine Sivakasi Crackers  |  Wholesale & Retail', 30, footerY, { width: 350, align: 'left' });
+      doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#64748B')
+         .text(`Page ${i + 1} of ${pages.count}`, doc.page.width - 130, footerY, { width: 100, align: 'right' });
     }
     
     doc.end();

@@ -158,12 +158,46 @@ const Shop = () => {
     sortedProducts.sort((a, b) => a.id - b.id);
   }
 
-  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
+  // Group filtered products category-wise in the order of categoriesList
+  const groupedCategoryProducts = useMemo(() => {
+    const map = {};
+    const uncategorized = [];
 
-  const handleItemsPerPageChange = (num) => {
-    setItemsPerPage(num);
-    setCurrentPage(1);
-  };
+    // Pre-populate categories from categoriesList to maintain exact sorting order
+    categoriesList.forEach(cat => {
+      map[cat.name] = {
+        id: cat.id,
+        name: cat.name,
+        items: []
+      };
+    });
+
+    // Distribute sortedProducts into categories
+    sortedProducts.forEach(product => {
+      const catName = product.category;
+      if (catName && map[catName]) {
+        map[catName].items.push(product);
+      } else if (catName) {
+        if (!map[catName]) {
+          map[catName] = { id: product.category_id || catName, name: catName, items: [] };
+        }
+        map[catName].items.push(product);
+      } else {
+        uncategorized.push(product);
+      }
+    });
+
+    // Only return categories that contain at least one product
+    const result = Object.values(map).filter(group => group.items.length > 0);
+    if (uncategorized.length > 0) {
+      result.push({
+        id: 'uncategorized',
+        name: 'General Crackers',
+        items: uncategorized
+      });
+    }
+    return result;
+  }, [sortedProducts, categoriesList]);
 
   return (
     <main className="shop-page bg-gray-50 min-h-screen pb-16">
@@ -175,7 +209,7 @@ const Shop = () => {
       />
       <ShopBanner />
       
-      <div className="max-w-7xl mx-auto px-1 sm:px-5 md:px-12 pt-8 md:pt-12">
+      <div className="max-w-7xl mx-auto px-2 sm:px-5 md:px-12 pt-6 sm:pt-8 md:pt-10">
         {/* Sidebar Drawer */}
         <ShopSidebar 
           isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}
@@ -199,18 +233,42 @@ const Shop = () => {
             setViewMode={setViewMode}
           />
 
-          {/* Product Listing */}
+          {/* Product Listing - Category-wise Grouped View */}
           {viewMode === 'list' ? (
-            <ProductTable products={sortedProducts} />
+            <ProductTable products={sortedProducts} categoriesList={categoriesList} />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedProducts.length > 0 ? (
-                sortedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} viewMode={viewMode} />
+            <div className="space-y-10 sm:space-y-12">
+              {groupedCategoryProducts.length > 0 ? (
+                groupedCategoryProducts.map((group) => (
+                  <section key={group.id} className="category-product-section">
+                    
+                    {/* Category Title Header Banner */}
+                    <div className="flex items-center justify-between bg-gradient-to-r from-red-700 via-brand to-amber-600 text-white px-4 sm:px-6 py-3 rounded-xl shadow-md mb-6 border border-red-600/20">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <span className="text-xl sm:text-2xl drop-shadow">💥</span>
+                        <h2 className="text-sm sm:text-base md:text-lg font-black uppercase font-heading tracking-wide drop-shadow-sm">
+                          {group.name}
+                        </h2>
+                      </div>
+                      <span className="text-[11px] sm:text-xs font-bold bg-white/20 backdrop-blur-sm px-2.5 sm:px-3 py-1 rounded-full border border-white/30 shrink-0 shadow-inner">
+                        {group.items.length} {group.items.length === 1 ? 'Item' : 'Items'}
+                      </span>
+                    </div>
+
+                    {/* Category Products Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                      {group.items.map((product) => (
+                        <ProductCard key={product.id} product={product} viewMode={viewMode} />
+                      ))}
+                    </div>
+
+                  </section>
                 ))
               ) : (
-                <div className="col-span-full py-10 text-center text-gray-500 font-semibold">
-                  No products found matching your filters.
+                <div className="bg-white rounded-2xl p-12 text-center text-gray-500 font-semibold border border-gray-100 shadow-sm">
+                  <div className="text-4xl mb-3">🔍</div>
+                  <p className="text-base text-gray-700 font-bold">No products found matching your filters.</p>
+                  <p className="text-xs text-gray-400 mt-1">Try clearing some filters or changing your search terms.</p>
                 </div>
               )}
             </div>
