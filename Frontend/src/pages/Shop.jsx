@@ -207,10 +207,17 @@ const Shop = () => {
   return (
     <main className="shop-page bg-gray-50 min-h-screen pb-16">
       <SEO 
-        title="Shop Sivakasi Crackers | Vela Agencies"
-        description="Browse our wide collection of premium Sivakasi crackers. Get the best wholesale prices on sparklers, atom bombs, flower pots, and family combo packs."
-        keywords="sivakasi crackers price list, buy crackers online, wholesale fireworks, crackers shop, vela agencies shop"
+        title="Vela Agencies Sivakasi | Buy Crackers Online | Wholesale & Retail Shop"
+        description="Shop authentic Sivakasi crackers online directly from Vela Agencies Sivakasi. Best wholesale prices for sparklers, sound crackers, chakkars, flower pots, rockets, fancy fireworks & gift boxes."
+        keywords="vela agencies sivakasi, vela agencies shop, buy crackers online sivakasi, sivakasi crackers online shopping, sivakasi crackers price list, wholesale crackers sivakasi, best crackers shop in sivakasi, diwali crackers wholesale sivakasi, sivakasi pattasu wholesale"
         url="https://www.velaagencies.com/shop"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": "Vela Agencies Sivakasi Crackers Collection",
+          "description": "Browse and buy authentic Sivakasi crackers at factory wholesale prices from Vela Agencies Sivakasi.",
+          "url": "https://www.velaagencies.com/shop"
+        }}
       />
       <ShopBanner />
       
@@ -248,14 +255,14 @@ const Shop = () => {
                   <section key={group.id} className="category-product-section">
                     
                     {/* Category Title Header Banner */}
-                    <div className="flex items-center justify-between bg-gradient-to-r from-red-700 via-brand to-amber-600 text-white px-4 sm:px-6 py-3 rounded-xl shadow-md mb-6 border border-red-600/20">
-                      <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex items-center justify-between bg-gradient-to-r from-[#991b1b] via-[#dc2626] to-[#d97706] !text-white text-white px-4 sm:px-6 py-3.5 rounded-xl shadow-md mb-6 border border-red-500/30">
+                      <div className="flex items-center gap-2.5 sm:gap-3.5">
                         <span className="text-xl sm:text-2xl drop-shadow">💥</span>
-                        <h2 className="text-sm sm:text-base md:text-lg font-black uppercase font-heading tracking-wide drop-shadow-sm">
+                        <h2 className="text-base sm:text-lg md:text-xl font-black uppercase font-heading tracking-wide !text-white text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] m-0 p-0">
                           {group.name}
                         </h2>
                       </div>
-                      <span className="text-[11px] sm:text-xs font-bold bg-white/20 backdrop-blur-sm px-2.5 sm:px-3 py-1 rounded-full border border-white/30 shrink-0 shadow-inner">
+                      <span className="text-xs sm:text-sm font-extrabold !text-white text-white bg-black/25 backdrop-blur-md px-3 sm:px-4 py-1 rounded-full border border-white/40 shrink-0 shadow-sm">
                         {group.items.length} {group.items.length === 1 ? 'Item' : 'Items'}
                       </span>
                     </div>

@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../config/db');
 const protect = require('../middleware/authMiddleware');
 const redis = require('../config/redis');
-const PDFDocument = require('pdfkit-table');
+const PDFDocument = require('pdfkit');
 const https = require('https');
 
 // Helper to invalidate caches
@@ -335,34 +335,40 @@ router.get('/pricelist/download', async (req, res) => {
 
     const contentWidth = doc.page.width - 60; // 535.28 pt
 
-    // 1. Draw Banner Image AT TOP (Moved to the very top as requested)
+    // 1. Draw Banner Image AT TOP with EXACT height calculation so doc.y is never overlapped
     if (bannerBuffer) {
       try {
-        doc.image(bannerBuffer, 30, 25, { width: contentWidth });
-        doc.moveDown(0.5);
+        const bannerImg = doc.openImage(bannerBuffer);
+        const bannerHeight = Math.min(220, (contentWidth / bannerImg.width) * bannerImg.height);
+        doc.image(bannerImg, 30, 25, { width: contentWidth, height: bannerHeight });
+        doc.y = 25 + bannerHeight + 12;
       } catch (e) {
         console.error('Error drawing banner:', e);
+        doc.y = 35;
       }
     } else if (logoBuffer) {
       try {
-        doc.image(logoBuffer, (doc.page.width - 90) / 2, 25, { width: 90 });
-        doc.moveDown(0.5);
+        const logoImg = doc.openImage(logoBuffer);
+        doc.image(logoImg, (doc.page.width - 90) / 2, 25, { width: 90 });
+        doc.y = 125;
       } catch (e) {
         console.error('Error drawing logo:', e);
+        doc.y = 35;
       }
+    } else {
+      doc.y = 35;
     }
 
-    // 2. Draw "VELA AGENCIES OFFICIAL PRICELIST" BELOW Banner
-    doc.moveDown(0.8);
-    doc.fontSize(22).font('Helvetica-Bold').fillColor('#B45309').text('VELA AGENCIES', { align: 'center' });
-    doc.fontSize(12).font('Helvetica-Bold').fillColor('#1E293B').text('OFFICIAL FESTIVE PRICELIST', { align: 'center' });
-    doc.fontSize(8.5).font('Helvetica').fillColor('#64748B').text(`${shopAddress} | Phone/WhatsApp: ${contactPhone} | ${frontendUrl.replace(/^https?:\/\//, '')}`, { align: 'center' });
+    // 2. Draw "VELA AGENCIES OFFICIAL PRICELIST" Cleanly BELOW Banner
+    doc.fontSize(22).font('Helvetica-Bold').fillColor('#DC2626').text('VELA AGENCIES', { align: 'center' });
+    doc.fontSize(12).font('Helvetica-Bold').fillColor('#0F172A').text('OFFICIAL FESTIVE PRICELIST', { align: 'center' });
+    doc.fontSize(8.5).font('Helvetica').fillColor('#475569').text(`${shopAddress}  |  Phone: ${contactPhone}  |  ${frontendUrl.replace(/^https?:\/\//, '')}`, { align: 'center' });
     
-    // Decorative Accent Line
-    doc.moveDown(0.5);
+    // Decorative Red Accent Line Below Header
+    doc.moveDown(0.4);
     const lineY = doc.y;
-    doc.lineWidth(1.5).strokeColor('#F59E0B').moveTo(30, lineY).lineTo(doc.page.width - 30, lineY).stroke();
-    doc.moveDown(0.8);
+    doc.lineWidth(1.5).strokeColor('#DC2626').moveTo(30, lineY).lineTo(doc.page.width - 30, lineY).stroke();
+    doc.y = lineY + 14;
 
     // Check if any product has an original price
     const hasAnyOriginalPrice = products.some(p => p.original_price && parseFloat(p.original_price) > 0);
@@ -376,22 +382,101 @@ router.get('/pricelist/download', async (req, res) => {
     });
 
     let globalSno = 1;
+    const tableWidth = 535;
+    const startX = 30;
+    const pageBottomLimit = doc.page.height - 35; // 806 pt
 
+    // Column configurations
+    const columns = hasAnyOriginalPrice ? [
+      { key: 'sno', label: 'S.No', width: 35, align: 'center' },
+      { key: 'name', label: 'Product Name', width: 255, align: 'left' },
+      { key: 'unit', label: 'Unit', width: 65, align: 'center' },
+      { key: 'orig', label: 'Original Price', width: 90, align: 'center' },
+      { key: 'rate', label: 'Discount Price', width: 90, align: 'center' }
+    ] : [
+      { key: 'sno', label: 'S.No', width: 45, align: 'center' },
+      { key: 'name', label: 'Product Name', width: 335, align: 'left' },
+      { key: 'unit', label: 'Unit', width: 75, align: 'center' },
+      { key: 'rate', label: 'Rate / Price', width: 80, align: 'center' }
+    ];
+
+    // Helper to draw table column headers (Yellow festive header)
+    const drawTableHeader = () => {
+      const headerH = 17;
+      let currX = startX;
+      
+      // Background & Border
+      doc.rect(startX, doc.y, tableWidth, headerH).fillAndStroke('#FACC15', '#64748B');
+      
+      columns.forEach((col, idx) => {
+        // Vertical column separator
+        if (idx > 0) {
+          doc.lineWidth(0.5).strokeColor('#64748B')
+             .moveTo(currX, doc.y).lineTo(currX, doc.y + headerH).stroke();
+        }
+        
+        doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#0F172A');
+        const textOptions = { width: col.width - 6, align: col.align };
+        doc.text(col.label, currX + 3, doc.y + 4.5, textOptions);
+        currX += col.width;
+      });
+      
+      doc.y += headerH;
+    };
+
+    const slugify = (text) => {
+      if (!text) return '';
+      return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+    };
+
+    // Iterate through categories
     for (const [categoryName, catProducts] of Object.entries(categories)) {
-      // Check page break for category header
-      if (doc.y > doc.page.height - 120) {
+      if (!catProducts || catProducts.length === 0) continue;
+
+      // Ensure space for Category Banner (20pt) + Column Header (17pt) + at least 1 Product Row (16.5pt) = 53.5pt
+      if (doc.y + 54 > pageBottomLimit) {
         doc.addPage();
+        doc.y = 35;
       }
 
-      // Attractive Category Header Banner Bar
+      // 1. Festive Category Banner
       const catHeaderY = doc.y;
-      doc.rect(30, catHeaderY, contentWidth, 22).fill('#1E3A8A'); // Royal Blue Bar
-      doc.font('Helvetica-Bold').fontSize(11).fillColor('#FFFFFF').text(`  ${categoryName.toUpperCase()} (${catProducts.length} ITEMS)`, 35, catHeaderY + 6);
-      doc.y = catHeaderY + 26;
+      const catHeaderH = 19;
+      doc.rect(startX, catHeaderY, tableWidth, catHeaderH).fillAndStroke('#DC2626', '#991B1B');
+      doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#FFFFFF')
+         .text(`  ${categoryName.toUpperCase()} (${catProducts.length} ITEMS)`, startX + 6, catHeaderY + 5);
+      
+      doc.y = catHeaderY + catHeaderH;
 
-      const tableData = catProducts.map((p) => {
+      // 2. Draw Table Header
+      drawTableHeader();
+
+      // 3. Draw Product Rows
+      catProducts.forEach((p, rowIndex) => {
+        const rowH = 16.5;
+
+        // Check if row fits on current page
+        if (doc.y + rowH > pageBottomLimit) {
+          doc.addPage();
+          doc.y = 35;
+          drawTableHeader(); // Repeat table header on continuation page
+        }
+
+        const rowY = doc.y;
+        const isEven = rowIndex % 2 === 0;
+        const rowBg = isEven ? '#FFFFFF' : '#F8FAFC';
+
+        // Draw row background
+        doc.rect(startX, rowY, tableWidth, rowH).fill(rowBg);
+
+        // Prepare cell data
         const orig = p.original_price ? parseFloat(p.original_price) : 0;
-        const curr = parseFloat(p.price);
+        const curr = parseFloat(p.price) || 0;
         
         let parsedUnit = 'packet';
         if (p.unit) {
@@ -404,91 +489,81 @@ router.get('/pricelist/download', async (req, res) => {
           }
         }
 
-        if (hasAnyOriginalPrice) {
-          return [
-            (globalSno++).toString(),
-            p.name,
-            parsedUnit,
-            orig > 0 ? `Rs. ${orig.toFixed(2)}` : '-',
-            `Rs. ${curr.toFixed(2)}`
-          ];
-        } else {
-          // Remove Original Price column completely if no original price exists
-          return [
-            (globalSno++).toString(),
-            p.name,
-            parsedUnit,
-            `Rs. ${curr.toFixed(2)}`
-          ];
-        }
+        const cellValues = hasAnyOriginalPrice ? {
+          sno: (globalSno++).toString(),
+          name: p.name || '',
+          unit: parsedUnit,
+          orig: orig > 0 ? `Rs. ${orig.toFixed(2)}` : '-',
+          rate: `Rs. ${curr.toFixed(2)}`
+        } : {
+          sno: (globalSno++).toString(),
+          name: p.name || '',
+          unit: parsedUnit,
+          rate: `Rs. ${curr.toFixed(2)}`
+        };
+
+        let currX = startX;
+        columns.forEach((col, idx) => {
+          // Draw cell text
+          if (col.key === 'name') {
+            doc.font('Helvetica-Bold').fontSize(8).fillColor('#0F172A');
+            const textY = rowY + 4;
+            doc.text(cellValues[col.key], currX + 5, textY, {
+              width: col.width - 10,
+              align: col.align,
+              lineBreak: false,
+              ellipsis: true
+            });
+
+            // Product clickable link
+            const productLink = `${frontendUrl}/product/${slugify(p.name)}`;
+            doc.link(currX, rowY, col.width, rowH, productLink);
+          } else if (col.key === 'rate') {
+            doc.font('Helvetica-Bold').fontSize(8).fillColor('#DC2626');
+            doc.text(cellValues[col.key], currX + 3, rowY + 4, {
+              width: col.width - 6,
+              align: col.align
+            });
+          } else if (col.key === 'orig') {
+            doc.font('Helvetica').fontSize(8).fillColor('#64748B');
+            doc.text(cellValues[col.key], currX + 3, rowY + 4, {
+              width: col.width - 6,
+              align: col.align
+            });
+          } else {
+            doc.font('Helvetica').fontSize(8).fillColor('#334155');
+            doc.text(cellValues[col.key], currX + 3, rowY + 4, {
+              width: col.width - 6,
+              align: col.align
+            });
+          }
+
+          // Column separator line
+          if (idx > 0) {
+            doc.lineWidth(0.5).strokeColor('#CBD5E1')
+               .moveTo(currX, rowY).lineTo(currX, rowY + rowH).stroke();
+          }
+
+          currX += col.width;
+        });
+
+        // Row border outline (top, bottom, left, right)
+        doc.lineWidth(0.5).strokeColor('#CBD5E1')
+           .rect(startX, rowY, tableWidth, rowH).stroke();
+
+        doc.y = rowY + rowH;
       });
 
-      const tableHeaders = hasAnyOriginalPrice ? [
-        { label: 'S.No', width: 35, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
-        { label: 'Product Name', width: 255, headerColor: '#FACC15', headerOpacity: 1, align: 'left' },
-        { label: 'Unit', width: 65, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
-        { label: 'Original Price', width: 90, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
-        { label: 'Discount Price', width: 90, headerColor: '#FACC15', headerOpacity: 1, align: 'center' }
-      ] : [
-        { label: 'S.No', width: 45, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
-        { label: 'Product Name', width: 335, headerColor: '#FACC15', headerOpacity: 1, align: 'left' },
-        { label: 'Unit', width: 75, headerColor: '#FACC15', headerOpacity: 1, align: 'center' },
-        { label: 'Rate / Price', width: 80, headerColor: '#FACC15', headerOpacity: 1, align: 'center' }
-      ];
-
-      const table = {
-        headers: tableHeaders,
-        rows: tableData
-      };
-
-      await doc.table(table, {
-        prepareHeader: () => doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#0F172A'),
-        prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
-          doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#1E293B');
-          
-          // Product Name click-through link
-          if (indexColumn === 1) {
-            const prod = catProducts[indexRow];
-            if (prod) {
-              const slugify = (text) => text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
-              const productLink = `${frontendUrl}/product/${slugify(prod.name)}`;
-              doc.link(rectCell.x, rectCell.y, rectCell.width, rectCell.height, productLink);
-              doc.fillColor('#1D4ED8'); // Clean Blue link color
-            }
-          }
-          
-          // Crisp, professional cell borders
-          doc.lineWidth(0.5).strokeColor('#94A3B8');
-          // Vertical right border
-          doc.moveTo(rectCell.x + rectCell.width, rectCell.y).lineTo(rectCell.x + rectCell.width, rectCell.y + rectCell.height).stroke();
-          // Vertical left border on first column
-          if (indexColumn === 0) {
-            doc.moveTo(rectCell.x, rectCell.y).lineTo(rectCell.x, rectCell.y + rectCell.height).stroke();
-          }
-          // Horizontal bottom border
-          doc.moveTo(rectCell.x, rectCell.y + rectCell.height).lineTo(rectCell.x + rectCell.width, rectCell.y + rectCell.height).stroke();
-        },
-        padding: 4
-      });
-
-      doc.moveDown(0.5);
+      // Margin before next category
+      doc.y += 10;
     }
 
     // Add watermark & footer page numbering to all pages
     const pages = doc.bufferedPageRange();
+    console.log('=== PDF GENERATED TOTAL PAGES ===:', pages.count);
     for (let i = 0; i < pages.count; i++) {
       doc.switchToPage(i);
       
-      // Background Watermark
-      if (logoBuffer) {
-        doc.save();
-        doc.opacity(0.06);
-        try {
-          doc.image(logoBuffer, (doc.page.width - 260) / 2, (doc.page.height - 260) / 2, { width: 260 });
-        } catch (e) {}
-        doc.restore();
-      }
-
       // Bottom Footer Bar
       const footerY = doc.page.height - 22;
       doc.lineWidth(0.5).strokeColor('#CBD5E1').moveTo(30, footerY - 5).lineTo(doc.page.width - 30, footerY - 5).stroke();
