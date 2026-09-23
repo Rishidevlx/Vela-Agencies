@@ -199,6 +199,11 @@ const Shop = () => {
     return result;
   }, [sortedProducts, categoriesList]);
 
+  const handleItemsPerPageChange = (num) => {
+    setItemsPerPage(num);
+    setCurrentPage(1);
+  };
+
   return (
     <main className="shop-page bg-gray-50 min-h-screen pb-16">
       <SEO 
