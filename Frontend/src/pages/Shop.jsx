@@ -257,7 +257,7 @@ const Shop = () => {
                     {/* Category Title Header Banner */}
                     <div className="flex items-center justify-between bg-gradient-to-r from-[#991b1b] via-[#dc2626] to-[#d97706] !text-white text-white px-4 sm:px-6 py-3.5 rounded-xl shadow-md mb-6 border border-red-500/30">
                       <div className="flex items-center gap-2.5 sm:gap-3.5">
-                        <span className="text-xl sm:text-2xl drop-shadow">💥</span>
+                        <span className="text-xl sm:text-2xl drop-shadow"></span>
                         <h2 className="text-base sm:text-lg md:text-xl font-black uppercase font-heading tracking-wide !text-white text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] m-0 p-0">
                           {group.name}
                         </h2>

@@ -329,7 +329,11 @@ router.get('/pricelist/download', async (req, res) => {
     }
 
     // 3. Generate PDF
-    const doc = new PDFDocument({ margin: 30, size: 'A4', bufferPages: true });
+    const doc = new PDFDocument({
+      margins: { top: 30, bottom: 10, left: 30, right: 30 },
+      size: 'A4',
+      bufferPages: true
+    });
     const buffers = [];
     doc.on('data', buffers.push.bind(buffers));
 
@@ -402,26 +406,31 @@ router.get('/pricelist/download', async (req, res) => {
 
     // Helper to draw table column headers (Yellow festive header)
     const drawTableHeader = () => {
-      const headerH = 17;
+      const headerH = 18;
+      const headerY = doc.y;
       let currX = startX;
       
-      // Background & Border
-      doc.rect(startX, doc.y, tableWidth, headerH).fillAndStroke('#FACC15', '#64748B');
+      // 1. Background & Border
+      doc.rect(startX, headerY, tableWidth, headerH).fillAndStroke('#FACC15', '#64748B');
       
+      // 2. Draw Column Separators and Text with fixed headerY
       columns.forEach((col, idx) => {
-        // Vertical column separator
         if (idx > 0) {
           doc.lineWidth(0.5).strokeColor('#64748B')
-             .moveTo(currX, doc.y).lineTo(currX, doc.y + headerH).stroke();
+             .moveTo(currX, headerY).lineTo(currX, headerY + headerH).stroke();
         }
         
         doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#0F172A');
-        const textOptions = { width: col.width - 6, align: col.align };
-        doc.text(col.label, currX + 3, doc.y + 4.5, textOptions);
+        doc.text(col.label, currX + 3, headerY + 4.5, {
+          width: col.width - 6,
+          align: col.align,
+          lineBreak: false
+        });
         currX += col.width;
       });
       
-      doc.y += headerH;
+      // Set doc.y cleanly to bottom of header
+      doc.y = headerY + headerH;
     };
 
     const slugify = (text) => {
@@ -449,7 +458,7 @@ router.get('/pricelist/download', async (req, res) => {
       const catHeaderH = 19;
       doc.rect(startX, catHeaderY, tableWidth, catHeaderH).fillAndStroke('#DC2626', '#991B1B');
       doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#FFFFFF')
-         .text(`  ${categoryName.toUpperCase()} (${catProducts.length} ITEMS)`, startX + 6, catHeaderY + 5);
+         .text(`  ${categoryName.toUpperCase()} (${catProducts.length} ITEMS)`, startX + 6, catHeaderY + 5, { lineBreak: false });
       
       doc.y = catHeaderY + catHeaderH;
 
@@ -522,19 +531,22 @@ router.get('/pricelist/download', async (req, res) => {
             doc.font('Helvetica-Bold').fontSize(8).fillColor('#DC2626');
             doc.text(cellValues[col.key], currX + 3, rowY + 4, {
               width: col.width - 6,
-              align: col.align
+              align: col.align,
+              lineBreak: false
             });
           } else if (col.key === 'orig') {
             doc.font('Helvetica').fontSize(8).fillColor('#64748B');
             doc.text(cellValues[col.key], currX + 3, rowY + 4, {
               width: col.width - 6,
-              align: col.align
+              align: col.align,
+              lineBreak: false
             });
           } else {
             doc.font('Helvetica').fontSize(8).fillColor('#334155');
             doc.text(cellValues[col.key], currX + 3, rowY + 4, {
               width: col.width - 6,
-              align: col.align
+              align: col.align,
+              lineBreak: false
             });
           }
 
@@ -560,17 +572,24 @@ router.get('/pricelist/download', async (req, res) => {
 
     // Add watermark & footer page numbering to all pages
     const pages = doc.bufferedPageRange();
-    console.log('=== PDF GENERATED TOTAL PAGES ===:', pages.count);
     for (let i = 0; i < pages.count; i++) {
       doc.switchToPage(i);
       
       // Bottom Footer Bar
-      const footerY = doc.page.height - 22;
-      doc.lineWidth(0.5).strokeColor('#CBD5E1').moveTo(30, footerY - 5).lineTo(doc.page.width - 30, footerY - 5).stroke();
+      const footerY = doc.page.height - 20;
+      doc.lineWidth(0.5).strokeColor('#CBD5E1').moveTo(30, footerY - 4).lineTo(doc.page.width - 30, footerY - 4).stroke();
       doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#64748B')
-         .text('Vela Agencies, Sivakasi  |  100% Genuine Sivakasi Crackers  |  Wholesale & Retail', 30, footerY, { width: 350, align: 'left' });
+         .text('Vela Agencies, Sivakasi  |  100% Genuine Sivakasi Crackers  |  Wholesale & Retail', 30, footerY, {
+           width: 350,
+           align: 'left',
+           lineBreak: false
+         });
       doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#64748B')
-         .text(`Page ${i + 1} of ${pages.count}`, doc.page.width - 130, footerY, { width: 100, align: 'right' });
+         .text(`Page ${i + 1} of ${pages.count}`, doc.page.width - 130, footerY, {
+           width: 100,
+           align: 'right',
+           lineBreak: false
+         });
     }
     
     doc.end();
